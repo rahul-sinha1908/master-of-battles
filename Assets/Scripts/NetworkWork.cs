@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 
 public class NetworkWork : NetworkBehaviour {
-
+	
 	// Use this for initialization
 	void Start () {
 		if (isServer) {
