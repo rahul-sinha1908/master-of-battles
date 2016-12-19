@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class CameraControl : MonoBehaviour {
 
 	GameObject checkBoard;
+	
 	// Use this for initialization
 	void Start () {
 		checkBoard = GameObject.Find ("CheckBoard");
