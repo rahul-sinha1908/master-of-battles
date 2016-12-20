@@ -11,8 +11,8 @@ public class ChessBoardFormation {
 			gameFormation.Add(new PlayerProperties(i));
 		}
 	}
-	public SyncListStruct<Point> TransFormToGame(){
-		SyncListStruct<Point> list=new SyncListStruct<Point>();
+	public List<Point> TransFormToGame(){
+		List<Point> list=new List<Point>();
 		for(int i=0;i<GameContants.NumberOfPlayer;i++){
 			Point p=gameFormation[i].loc;
 			list.Add(p);
