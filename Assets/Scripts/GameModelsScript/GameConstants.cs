@@ -8,5 +8,5 @@ namespace MasterOfBattles{
 	}
 	public class GameContants{
 		public static int NumberOfPlayer=30;
-	}
+	}	
 }
