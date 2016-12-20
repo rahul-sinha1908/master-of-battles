@@ -10,7 +10,7 @@ public class PlayerProperties {
 	public int HealthMetre, curHealth, playerIndex;
 	public Point loc;
 	public List<int> powers;
-
+	
 	public PlayerProperties(int i){
 		playerIndex=i;
 		Load();
