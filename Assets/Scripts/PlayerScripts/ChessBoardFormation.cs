@@ -4,7 +4,7 @@ using MasterOfBattles;
 using UnityEngine.Networking;
 public class ChessBoardFormation {
 
-	List<PlayerProperties> gameFormation;
+	public List<PlayerProperties> gameFormation;
 	public ChessBoardFormation(){
 		gameFormation=new List<PlayerProperties>();
 		for(int i=0;i<GameContants.NumberOfPlayer;i++){

@@ -7,10 +7,13 @@ using MasterOfBattles;
 using UnityEngine;
 
 public class PlayerProperties {
+	public struct powerStruct{
+		public int id,intensity;
+	};
 	public int HealthMetre, curHealth, playerIndex;
 	public Point loc;
-	public List<int> powers;
-	
+	public List<powerStruct> powers;
+
 	public PlayerProperties(int i){
 		playerIndex=i;
 		Load();
@@ -31,8 +34,10 @@ public class PlayerProperties {
 		if(File.Exists(Application.persistentDataPath + "/savedPlayerProperties.rgo")) {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream file = File.Open(Application.persistentDataPath + "/savedPlayerProperties.rgo", FileMode.Open);
-			powers = (List<int>)bf.Deserialize(file);
+			powers = (List<powerStruct>)bf.Deserialize(file);
 			file.Close();
+		}else{
+			powers=new List<powerStruct>();
 		}
 	}
 
