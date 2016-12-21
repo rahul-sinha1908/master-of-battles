@@ -13,10 +13,10 @@ public class MyPlayerScript : NetworkBehaviour {
 	private GameObject otherPlayer;
 	public GameObject prefab;
 	private Vector3 offset=new Vector3(-14.5f,0,-14.5f);
-	struct Moves{
-		short ind,x,y;
-		short attackInd;
-		int intensity;
+	public struct Moves{
+		public short ind,x,y;
+		public short attackInd;
+		public int intensity;
 	};
 	public struct PlayerDetails{
 		public short ind,x,y, playerType;
@@ -24,6 +24,8 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	
 	protected PlayerDetails[] players;
+	private GameObject[] playerObjects;
+	private List<Moves> attackMoves;
 	ChessBoardFormation chess;
 
 	private void Start () {
@@ -37,6 +39,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		}else if(!isServer && !isLocalPlayer){
 			transform.name="ServerPlayer";
 		}
+		attackMoves=new List<Moves>();
 		initLocalVar();
 	}
 	private void initLocalVar(){
@@ -53,7 +56,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				p.playerType=1;
 				players[i]=p;
 			}
-			createPlayer();
+			createPlayer(true);
 			if(!isServer){
 				CmdInitiatePlayers(players);
 				// short[] a=new short[1];
@@ -62,27 +65,35 @@ public class MyPlayerScript : NetworkBehaviour {
 			}
 		}
 	}
+	private void createPlayer(bool myTeam){
+		Debug.Log("Toatal Players :"+players.Length);
+		playerObjects=new GameObject[players.Length];
+		for(int i=0;i<players.Length;i++){
+			GameObject go = GameObject.Instantiate(prefab,new Vector3(players[i].x,0,players[i].y)+offset,Quaternion.identity);
+			if(myTeam){
+				go.transform.tag="MyTeam";
+				go.name="MyTeam"+players[i].ind;
+			}else{
+				go.transform.tag="OpponentTeam";
+				go.name="OpponentTeam"+players[i].ind;
+			}
+			playerObjects[i]=go;
+			//go.layer=LayerMask.GetMask("Hello");
+		}
+	}
 
+
+//Remote Calls From Here
 	[Command]
 	private void CmdMovePos(Moves[] moves){
 		doAllThresholdMoves(moves);
-	}
-	private void createPlayer(){
-		Debug.Log("Toatal Players :"+players.Length);
-		for(int i=0;i<players.Length;i++){
-			GameObject.Instantiate(prefab,new Vector3(players[i].x,0,players[i].y)+offset,Quaternion.identity);
-		}
-	}
-	[Command]
-	private void CmdCheck(short[] a){
-		Debug.Log("Got the message : "+a[0]);
 	}
 	[Command]
 	private void CmdInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
 		//DONE Send Details back to the Client through the otherPlayer
 		this.players=players;
-		createPlayer();
+		createPlayer(false);
 		initOtherPlayer();
 		MyPlayerScript oP=otherPlayer.GetComponent<MyPlayerScript>();
 		oP.RpcInitiatePlayers(oP.players);
@@ -97,7 +108,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	public void RpcInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
 		this.players=players;
-		createPlayer();
+		createPlayer(false);
 	}
 
 	[Command]
@@ -105,8 +116,17 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	}
 
+//Remote Calls Till Here
 	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
+		for(int i=0;i<moves.Length;i++){
+			if(moves[i].attackInd!=-1){
+				players[moves[i].ind].x=moves[i].x;
+				players[moves[i].ind].y=moves[i].y;
+			}else{
+				attackMoves.Add(moves[i]);
+			}
+		}
 	}
 
 	private void initOtherPlayer(){
@@ -121,10 +141,29 @@ public class MyPlayerScript : NetworkBehaviour {
 				otherPlayer=GameObject.Find("ClientPlayer");
 		}
 	}
+	private bool comparePositions(GameObject g, PlayerDetails p){
+		if(g.transform.position.x==p.x && g.transform.position.y==p.y)
+			return true;
+		return false;
+	}
 	private void Update () {
 		initOtherPlayer();
 		if(!isLocalPlayer)
 			return;
+
+		if(players!=null){
+			for(int i=0;i<players.Length;i++){
+				if(playerObjects[i]!=null){
+					if(comparePositions(playerObjects[i],players[i])){
+						//TODO Do animation and stuffs
+						playerObjects[i].transform.position=new Vector3(players[i].x,0, players[i].y);
+					}
+				}
+			}
+			if(attackMoves.Count>0){
+				//TODO Do the attack Sequence
+			}
+		}
 		//TODO Display All my Characters 
 	}
 }

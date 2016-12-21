@@ -11,7 +11,7 @@ public class PlayerProperties {
 	public struct powerStruct{
 		public int id,intensity;
 	};
-	public int healthMetre, curHealth, playerIndex;
+	public int healthMetre, curHealth, playerIndex, playerType;
 	public Point loc;
 	public List<powerStruct> powers;
 
@@ -37,6 +37,7 @@ public class PlayerProperties {
 	private void LoadInit(){
 		healthMetre=50;
 		powers=new List<powerStruct>();
+		playerType=1;
 		loc.x=playerIndex;
 		loc.y=0;
 	}
