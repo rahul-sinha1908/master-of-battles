@@ -11,16 +11,19 @@ public class MyPlayerScript : NetworkBehaviour {
 	public bool playerCountDown;
 
 	private GameObject otherPlayer;
+	public GameObject prefab;
+	private Vector3 offset=new Vector3(-14.5f,0,-14.5f);
 	struct Moves{
 		short ind,x,y;
 		short attackInd;
 		int intensity;
 	};
-	struct PlayerDetails{
-		short ind,x,y, playerType;
+	public struct PlayerDetails{
+		public short ind,x,y, playerType;
 	}
 
-	List<Point> onLoc;
+	
+	protected List<PlayerDetails> players;
 	ChessBoardFormation chess;
 
 	private void Start () {
@@ -39,7 +42,21 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void initLocalVar(){
 		if(isLocalPlayer){
 			chess=new ChessBoardFormation();
-			onLoc=chess.TransFormToGame();
+			List<Point> onLoc;
+			onLoc=chess.TransFormToGame(!isServer);
+			players=new List<PlayerDetails>();
+			for(int i=0;i<onLoc.Count;i++){
+				PlayerDetails p;
+				p.ind=(short)i;
+				p.x=(short)onLoc[i].x;
+				p.y=(short)onLoc[i].y;
+				p.playerType=1;
+				players.Add(p);
+			}
+			createPlayer();
+			if(!isServer){
+				CmdInitiatePlayers(players);
+			}
 		}
 	}
 
@@ -47,10 +64,21 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void CmdMovePos(List<Moves> moves){
 		doAllThresholdMoves(moves);
 	}
-
+	private void createPlayer(){
+		Debug.Log("Toatal Players :"+players.Count);
+		for(int i=0;i<players.Count;i++){
+			GameObject.Instantiate(prefab,new Vector3(players[i].x,0,players[i].y)+offset,Quaternion.identity);
+		}
+	}
 	[Command]
 	private void CmdInitiatePlayers(List<PlayerDetails> players){
-		//TODO Send the initial playerDetails
+		//DONE Send the initial playerDetails
+		//DONE Send Details back to the Client through the otherPlayer
+		this.players=players;
+		createPlayer();
+		initOtherPlayer();
+		MyPlayerScript oP=otherPlayer.GetComponent<MyPlayerScript>();
+		oP.RpcInitiatePlayers(oP.players);
 	}
 
 	[ClientRpc]
@@ -59,8 +87,10 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	private void RpcInitiatePlayers(List<PlayerDetails> players){
-		//TODO Send the initial playerDetails
+	public void RpcInitiatePlayers(List<PlayerDetails> players){
+		//DONE Send the initial playerDetails
+		this.players=players;
+		createPlayer();
 	}
 
 	[Command]
@@ -72,7 +102,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		//TODO Complete the threshold Move
 	}
 
-	private void Update () {
+	private void initOtherPlayer(){
 		if(otherPlayer==null){
 			if(isServer && isLocalPlayer)
 				otherPlayer=GameObject.Find("ClientPlayer");
@@ -83,6 +113,9 @@ public class MyPlayerScript : NetworkBehaviour {
 			else if(!isServer && !isLocalPlayer)
 				otherPlayer=GameObject.Find("ClientPlayer");
 		}
+	}
+	private void Update () {
+		initOtherPlayer();
 		if(!isLocalPlayer)
 			return;
 		//TODO Display All my Characters 

@@ -14,6 +14,9 @@ namespace MasterOfBattles{
 	};
 	public class GameContants{
 		public static int NumberOfPlayer=30;
+		public static int DefaultHealth=50;
+		public static int sizeOfBoardX=30;
+		public static int sizeOfBoardY=30;
 	}
 	public class PowersContant{
 		 //public static PowerNameId 

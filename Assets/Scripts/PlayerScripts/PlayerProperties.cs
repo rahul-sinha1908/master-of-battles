@@ -7,6 +7,7 @@ using MasterOfBattles;
 using UnityEngine;
 
 public class PlayerProperties {
+	private string fileName;
 	public struct powerStruct{
 		public int id,intensity;
 	};
@@ -16,7 +17,9 @@ public class PlayerProperties {
 
 	public PlayerProperties(int i){
 		playerIndex=i;
-		Load();
+		fileName="/savedPlayerProperties-"+i+".rgo";
+		//Load();
+		LoadInit();
 		//TODO Make the function to get the datas from the file
 	}
 	
@@ -26,19 +29,35 @@ public class PlayerProperties {
 	}
 	private void Save() {
 		BinaryFormatter bf = new BinaryFormatter();
-		FileStream file = File.Create (Application.persistentDataPath + "/savedPlayerProperties.rgo");
+		FileStream file = File.Create (Application.persistentDataPath + fileName);
 		bf.Serialize(file, powers);
 		file.Close();
+		PlayerPrefs.SetInt(fileName+"Health",healthMetre);
+	}
+	private void LoadInit(){
+		healthMetre=50;
+		powers=new List<powerStruct>();
+		loc.x=playerIndex;
+		loc.y=0;
 	}
 	private void Load() {
-		if(File.Exists(Application.persistentDataPath + "/savedPlayerProperties.rgo")) {
+		if(File.Exists(Application.persistentDataPath + fileName)) {
 			BinaryFormatter bf = new BinaryFormatter();
-			FileStream file = File.Open(Application.persistentDataPath + "/savedPlayerProperties.rgo", FileMode.Open);
+			FileStream file = File.Open(Application.persistentDataPath + fileName, FileMode.Open);
 			powers = (List<powerStruct>)bf.Deserialize(file);
 			file.Close();
 		}else{
 			powers=new List<powerStruct>();
 		}
+		healthMetre= PlayerPrefs.GetInt(fileName+"Health",GameContants.DefaultHealth);
 	}
+	public void addPOwers(int id, int intensity){
+		powerStruct power;
+		power.id=id;
+		power.intensity=intensity;
+		if(powers==null)
+			powers=new List<powerStruct>();
 
+		powers.Add(power);
+	}
 }
