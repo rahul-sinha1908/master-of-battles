@@ -24,11 +24,15 @@ public class MyPlayerScript : NetworkBehaviour {
 	ChessBoardFormation chess;
 
 	private void Start () {
-		if(isServer){
+		if(isServer && isLocalPlayer){
 			transform.name="ServerPlayer";
-		}
-		else{
+		}else if(isServer && !isLocalPlayer){
 			transform.name="ClientPlayer";
+		}
+		if(!isServer && isLocalPlayer){
+			transform.name="ClientPlayer";
+		}else if(!isServer && !isLocalPlayer){
+			transform.name="ServerPlayer";
 		}
 		initLocalVar();
 	}
@@ -70,10 +74,14 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	private void Update () {
 		if(otherPlayer==null){
-			if(isServer)
+			if(isServer && isLocalPlayer)
 				otherPlayer=GameObject.Find("ClientPlayer");
-			else
+			else if(isServer && !isLocalPlayer)
 				otherPlayer=GameObject.Find("ServerPlayer");
+			if(!isServer && isLocalPlayer)
+				otherPlayer=GameObject.Find("ServerPlayer");
+			else if(!isServer && !isLocalPlayer)
+				otherPlayer=GameObject.Find("ClientPlayer");
 		}
 		if(!isLocalPlayer)
 			return;
