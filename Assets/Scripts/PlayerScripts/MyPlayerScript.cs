@@ -23,7 +23,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 
 	
-	protected List<PlayerDetails> players;
+	protected PlayerDetails[] players;
 	ChessBoardFormation chess;
 
 	private void Start () {
@@ -44,34 +44,41 @@ public class MyPlayerScript : NetworkBehaviour {
 			chess=new ChessBoardFormation();
 			List<Point> onLoc;
 			onLoc=chess.TransFormToGame(!isServer);
-			players=new List<PlayerDetails>();
+			players=new PlayerDetails[onLoc.Count];
 			for(int i=0;i<onLoc.Count;i++){
 				PlayerDetails p;
 				p.ind=(short)i;
 				p.x=(short)onLoc[i].x;
 				p.y=(short)onLoc[i].y;
 				p.playerType=1;
-				players.Add(p);
+				players[i]=p;
 			}
 			createPlayer();
 			if(!isServer){
 				CmdInitiatePlayers(players);
+				// short[] a=new short[1];
+				// a[0]=10;
+				// CmdCheck(a);
 			}
 		}
 	}
 
 	[Command]
-	private void CmdMovePos(List<Moves> moves){
+	private void CmdMovePos(Moves[] moves){
 		doAllThresholdMoves(moves);
 	}
 	private void createPlayer(){
-		Debug.Log("Toatal Players :"+players.Count);
-		for(int i=0;i<players.Count;i++){
+		Debug.Log("Toatal Players :"+players.Length);
+		for(int i=0;i<players.Length;i++){
 			GameObject.Instantiate(prefab,new Vector3(players[i].x,0,players[i].y)+offset,Quaternion.identity);
 		}
 	}
 	[Command]
-	private void CmdInitiatePlayers(List<PlayerDetails> players){
+	private void CmdCheck(short[] a){
+		Debug.Log("Got the message : "+a[0]);
+	}
+	[Command]
+	private void CmdInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
 		//DONE Send Details back to the Client through the otherPlayer
 		this.players=players;
@@ -82,12 +89,12 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	private void RpcMovePos(List<Moves> moves){
+	private void RpcMovePos(Moves[] moves){
 		doAllThresholdMoves(moves);
 	}
 
 	[ClientRpc]
-	public void RpcInitiatePlayers(List<PlayerDetails> players){
+	public void RpcInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
 		this.players=players;
 		createPlayer();
@@ -98,7 +105,7 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	}
 
-	private void doAllThresholdMoves(List<Moves> moves){
+	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
 	}
 
