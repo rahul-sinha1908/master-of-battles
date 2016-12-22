@@ -5,13 +5,9 @@ using UnityEngine.Networking;
 using MasterOfBattles;
 
 public class MyPlayerScript : NetworkBehaviour {
-	[SyncVar]
-	public int timeleft;
-	[SyncVar]
-	public bool playerCountDown;
-
 	private GameObject otherPlayer;
 	public GameObject prefab;
+	public GameObject timer;
 	private Vector3 offset=new Vector3(-14.5f,0,-14.5f);
 	public struct Moves{
 		public short ind,x,y;
@@ -40,6 +36,10 @@ public class MyPlayerScript : NetworkBehaviour {
 			transform.name="ServerPlayer";
 		}
 		attackMoves=new List<Moves>();
+		if(isServer){
+			GameObject g = GameObject.Instantiate(timer);
+			NetworkServer.Spawn(g);
+		}
 		initLocalVar();
 	}
 	private void initLocalVar(){
@@ -82,6 +82,17 @@ public class MyPlayerScript : NetworkBehaviour {
 		}
 	}
 
+	public void sendMoves(){
+		if(!isLocalPlayer)
+			return;
+		
+		Moves[] moves=new Moves[10];		
+		if(isServer){
+			RpcMovePos(moves);
+		}else if(!isServer){
+			CmdMovePos(moves);
+		}
+	}
 
 //Remote Calls From Here
 	[Command]

@@ -17,6 +17,7 @@ namespace MasterOfBattles{
 		public static int DefaultHealth=50;
 		public static int sizeOfBoardX=30;
 		public static int sizeOfBoardY=30;
+		public static int timeConstant=10;
 	}
 	public class PowersContant{
 		 //public static PowerNameId 
