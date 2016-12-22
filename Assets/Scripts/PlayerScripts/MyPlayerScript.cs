@@ -23,6 +23,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	ChessBoardFormation chess;
 
 	private void Start () {
+		Debug.Log("My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
 		if(isServer && isLocalPlayer){
 			transform.name="ServerPlayer";
 		}else if(isServer && !isLocalPlayer){
