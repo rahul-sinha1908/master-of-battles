@@ -92,7 +92,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		if(!isLocalPlayer)
 			return;
 		
-		Moves[] moves=new Moves[10];		
+		Moves[] moves=new Moves[1];		
 		if(isServer){
 			RpcMovePos(moves);
 		}else if(!isServer){
@@ -103,12 +103,14 @@ public class MyPlayerScript : NetworkBehaviour {
 //Remote Calls From Here
 	[Command]
 	private void CmdMovePos(Moves[] moves){
+		Debug.Log("Cmd Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 	}
 	[Command]
 	private void CmdInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
 		//DONE Send Details back to the Client through the otherPlayer
+		Debug.Log("Cmd Init Got in : "+players.Length);
 		this.players=players;
 		createPlayer(false);
 		initOtherPlayer();
@@ -118,19 +120,16 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcMovePos(Moves[] moves){
+		Debug.Log("Rpc Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 	}
 
 	[ClientRpc]
 	public void RpcInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
+		Debug.Log("Rpc Initiate Player : "+players.Length);
 		this.players=players;
 		createPlayer(false);
-	}
-
-	[Command]
-	public void CmdAct(){
-
 	}
 
 //Remote Calls Till Here
