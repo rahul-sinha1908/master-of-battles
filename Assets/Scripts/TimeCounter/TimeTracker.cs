@@ -14,7 +14,7 @@ public class TimeTracker : NetworkBehaviour {
 	[SyncVar]
 	public bool playerCountDownClient=false;
 
-	private GameObject serverPLayer, clientPlayer;
+	private GameObject serverPlayer, clientPlayer;
 	private MyPlayerScript serverPLayerScript, clientPlayerScript;
 	
 	// Use this for initialization
@@ -23,12 +23,14 @@ public class TimeTracker : NetworkBehaviour {
 	}
 	
 	private void initiateMyGamePlayers(){
-		if(serverPLayer==null){
-			serverPLayer=GameObject.Find("ServerPlayer");
-			serverPLayerScript=serverPLayer.GetComponent<MyPlayerScript>();
+		if(serverPlayer==null){
+			serverPlayer=GameObject.Find("ServerPlayer");
+			if(serverPlayer!=null)
+				serverPLayerScript=serverPlayer.GetComponent<MyPlayerScript>();
 		}if(clientPlayer==null){
 			clientPlayer=GameObject.Find("ClientPlayer");
-			clientPlayerScript=clientPlayer.GetComponent<MyPlayerScript>();
+			if(clientPlayer!=null)
+				clientPlayerScript=clientPlayer.GetComponent<MyPlayerScript>();
 		}
 	}
 	

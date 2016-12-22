@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using MasterOfBattles;
 using UnityEngine.Networking;
 public class ChessBoardFormation {
-
+	
+	public static ChessBoardFormation instance;
 	public List<PlayerProperties> gameFormation;
-	public ChessBoardFormation(){
+	private ChessBoardFormation(){
 		gameFormation=new List<PlayerProperties>();
 		for(int i=0;i<GameContants.NumberOfPlayer;i++){
 			gameFormation.Add(new PlayerProperties(i));
 		}
+	}
+	public static ChessBoardFormation getInstance(){
+		if(instance==null){
+			instance=new ChessBoardFormation();
+		}
+		return instance;
 	}
 	public void saveAllTransforms(){
 		for(int i=0;i<GameContants.NumberOfPlayer;i++){
