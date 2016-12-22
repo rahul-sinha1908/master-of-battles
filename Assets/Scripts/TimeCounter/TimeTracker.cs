@@ -38,7 +38,7 @@ public class TimeTracker : NetworkBehaviour {
 	}
 
 	[Command]
-	private void changeClientCountDown(bool b){
+	private void CmdchangeClientCountDown(bool b){
 		playerCountDownClient=b;
 	}
 	[Command]
@@ -46,12 +46,15 @@ public class TimeTracker : NetworkBehaviour {
 		timeleft=-1;
 		playerCountDownClient=false;
 		playerCountDownServer=false;
-	} 
+	}
+	private void sendMoves(){
+		serverPLayerScript.sendMoves();
+		clientPlayerScript.sendMoves();
+		CmdreinitCount();
+	}
 	private void calculateTimeActions(){
 		if(playerCountDownClient && playerCountDownServer){
-				serverPLayerScript.sendMoves();
-				clientPlayerScript.sendMoves();
-				CmdreinitCount();
+				sendMoves();
 		}
 		if(isServer){
 			if(!playerCountDownClient && !playerCountDownServer){
@@ -77,9 +80,7 @@ public class TimeTracker : NetworkBehaviour {
 		calculateTimeActions();
 		if(timeleft!=-1){
 			if(timeleft<=0){
-				serverPLayerScript.sendMoves();
-				clientPlayerScript.sendMoves();
-				CmdreinitCount();
+				sendMoves();
 			}
 			else{
 				//TODO Show the Canvas with time Left Bar and a cancel button too
@@ -90,13 +91,13 @@ public class TimeTracker : NetworkBehaviour {
 	}
 	public void clickedOnCancel(){
 		if(!isServer)
-			changeClientCountDown(false);
+			CmdchangeClientCountDown(false);
 		else
 			playerCountDownServer=false;
 	}
 	public void clickedOnAccept(){
 		if(!isServer)
-			changeClientCountDown(true);
+			CmdchangeClientCountDown(true);
 		else
 			playerCountDownServer=true;
 	}
