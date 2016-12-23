@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using MasterOfBattles;
 
 public class CameraControl : MonoBehaviour {
 
@@ -10,6 +11,7 @@ public class CameraControl : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		checkBoard = GameObject.Find ("CheckBoard");
+		transform.position=GameContants.boxSize*transform.position;
 	}
 	
 	// Update is called once per frame

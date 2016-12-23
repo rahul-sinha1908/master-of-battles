@@ -27,6 +27,7 @@ public class GameMoveListener : MonoBehaviour {
 			RaycastHit hit;
 			//TODO Put a layer mask on this.
 			if(Physics.Raycast(ray,out hit,100)){
+				//TODO Divide this by a constant if you want to increase the area of the play
 				boxX=(int)Mathf.Floor(hit.point.x)+offsetHitX;
 				boxY=(int)Mathf.Floor(hit.point.z)+offsetHitY;
 				Debug.Log(hit.point+" : "+boxX+" : "+boxY);
@@ -70,8 +71,8 @@ public class GameMoveListener : MonoBehaviour {
 			RaycastHit hit;
 			//TODO Put a layer mask on this.
 			if(Physics.Raycast(ray,out hit,100)){
-				boxX=(int)Mathf.Floor(hit.point.x)+offsetHitX;
-				boxY=(int)Mathf.Floor(hit.point.z)+offsetHitY;
+				boxX=(int)Mathf.Floor(hit.point.x/GameContants.boxSize)+offsetHitX;
+				boxY=(int)Mathf.Floor(hit.point.z/GameContants.boxSize)+offsetHitY;
 				Debug.Log(hit.point+" : "+boxX+" : "+boxY);
 			}
 		}

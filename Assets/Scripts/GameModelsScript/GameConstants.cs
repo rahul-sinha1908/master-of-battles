@@ -16,11 +16,18 @@ namespace MasterOfBattles{
 		public short ind,x,y, playerType;
 	}
 
+	public struct Moves{
+		public short ind,x,y;
+		public short attackInd;
+		public int intensity;
+	};
+
 	public class GameContants{
 		public static int NumberOfPlayer=30;
 		public static int DefaultHealth=50;
 		public static int sizeOfBoardX=30;
 		public static int sizeOfBoardY=30;
+		public static int boxSize=3;
 		public static int timeConstant=10;
 	}
 }

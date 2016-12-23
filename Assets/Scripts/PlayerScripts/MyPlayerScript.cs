@@ -11,12 +11,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	public Camera cam;
 	private GameMoveListener gameMoveListener;
 	private Vector3 offset=new Vector3(-14.5f,0,-14.5f);
-	public struct Moves{
-		public short ind,x,y;
-		public short attackInd;
-		public int intensity;
-	};
-	
+	private Vector3 playerHeight=new Vector3(0,1,0);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
 	private List<Moves> attackMoves;
@@ -72,7 +67,11 @@ public class MyPlayerScript : NetworkBehaviour {
 		playerObjects=new GameObject[players.Length];
 		for(int i=0;i<players.Length;i++){
 			//TODO Make the prefab dynamic instead of static
-			GameObject go = GameObject.Instantiate(prefab,new Vector3(players[i].x,0,players[i].y)+offset,Quaternion.identity);
+			Vector3 creationPoint=new Vector3(players[i].x,0,players[i].y)+offset+playerHeight;
+			creationPoint.x*=GameContants.boxSize;
+			creationPoint.z*=GameContants.boxSize;
+			//Debug.Log("For "+i+" : "+creationPoint);
+			GameObject go = GameObject.Instantiate(prefab,creationPoint,Quaternion.identity);
 			if(myTeam){
 				go.transform.tag="MyTeam";
 				go.name="MyTeam"+players[i].ind;
@@ -158,7 +157,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		}
 	}
 	private bool comparePositions(GameObject g, PlayerDetails p){
-		if(g.transform.position.x==p.x && g.transform.position.y==p.y)
+		if(g.transform.position.x==p.x*GameContants.boxSize && g.transform.position.y==p.y*GameContants.boxSize)
 			return true;
 		return false;
 	}
@@ -172,7 +171,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				if(playerObjects[i]!=null){
 					if(comparePositions(playerObjects[i],players[i])){
 						//TODO Do animation and stuffs
-						playerObjects[i].transform.position=new Vector3(players[i].x,0, players[i].y);
+						playerObjects[i].transform.position=(new Vector3(players[i].x,0, players[i].y))*GameContants.boxSize+playerHeight;
 					}
 				}
 			}
