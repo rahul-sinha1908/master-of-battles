@@ -87,11 +87,10 @@ public class MyPlayerScript : NetworkBehaviour {
 		return players;
 	}
 
-	public void sendMoves(){
+	public void sendMoves(Moves[] moves){
 		if(!isLocalPlayer)
 			return;
 		
-		Moves[] moves=new Moves[1];		
 		if(isServer){
 			RpcMovePos(moves);
 		}else if(!isServer){
@@ -119,6 +118,8 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	[ClientRpc]
 	private void RpcMovePos(Moves[] moves){
+		if(isServer)
+			return;
 		Debug.Log("Rpc Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 	}
@@ -126,6 +127,8 @@ public class MyPlayerScript : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
+		if(isServer)
+			return;
 		Debug.Log("Rpc Initiate Player : "+players.Length);
 		this.players=players;
 		createPlayer(false);

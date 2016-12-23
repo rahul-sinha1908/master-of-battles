@@ -50,8 +50,13 @@ public class TimeTracker : NetworkBehaviour {
 		playerCountDownServer=false;
 	}
 	private void sendMoves(){
-		serverPLayerScript.sendMoves();
-		clientPlayerScript.sendMoves();
+		Moves[] moves=new Moves[1];
+		moves[0].ind=5;
+		moves[0].x=5;
+		moves[0].y=5;
+
+		serverPLayerScript.sendMoves(moves);
+		clientPlayerScript.sendMoves(moves);
 		CmdreinitCount();
 	}
 	private void calculateTimeActions(){
