@@ -39,10 +39,7 @@ public class TimeTracker : NetworkBehaviour {
 
 	}
 
-	[Command]
-	private void CmdchangeClientCountDown(bool b){
-		playerCountDownClient=b;
-	}
+	
 	[Command]
 	private void CmdreinitCount(){
 		timeleft=-1;
@@ -50,13 +47,8 @@ public class TimeTracker : NetworkBehaviour {
 		playerCountDownServer=false;
 	}
 	private void sendMoves(){
-		Moves[] moves=new Moves[1];
-		moves[0].ind=5;
-		moves[0].x=5;
-		moves[0].y=5;
-
-		serverPLayerScript.sendMoves(moves);
-		clientPlayerScript.sendMoves(moves);
+		serverPLayerScript.sendMoves();
+		clientPlayerScript.sendMoves();
 		CmdreinitCount();
 	}
 	private void calculateTimeActions(){
@@ -98,14 +90,22 @@ public class TimeTracker : NetworkBehaviour {
 	}
 	public void clickedOnCancel(){
 		if(!isServer)
-			CmdchangeClientCountDown(false);
+			clientPlayerScript.changeClientCountDown(false);
 		else
 			playerCountDownServer=false;
 	}
 	public void clickedOnAccept(){
 		if(!isServer)
-			CmdchangeClientCountDown(true);
+			clientPlayerScript.changeClientCountDown(true);
 		else
 			playerCountDownServer=true;
+	}
+	
+	private void OnGUI()
+	{
+		if(GUI.Button(new Rect(100,100,50,50),"Send Move")){
+			if(!isServer)
+				clientPlayerScript.changeClientCountDown(true);
+		}
 	}
 }

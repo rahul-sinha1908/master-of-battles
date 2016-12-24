@@ -6,6 +6,8 @@ using System;
 
 public class MyNetworkManager : NetworkManager {
 
+	//TODO Restrict Adding more than one Client
+
 	// public override void OnServerAddPlayer (NetworkConnection conn, short playerControllerId)
 	// {
 	// 	base.OnServerAddPlayer (conn, playerControllerId);

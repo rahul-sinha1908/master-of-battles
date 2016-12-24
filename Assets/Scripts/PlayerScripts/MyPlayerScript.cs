@@ -8,6 +8,8 @@ public class MyPlayerScript : NetworkBehaviour {
 	private GameObject otherPlayer;
 	public GameObject prefab;
 	public GameObject timerPrefab;
+	private GameObject timeObject;
+	private TimeTracker timeTracker;
 	public Camera cam;
 	private GameMoveListener gameMoveListener;
 	private Vector3 offset=new Vector3(-14.5f,0,-14.5f);
@@ -15,6 +17,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
 	private List<Moves> attackMoves;
+	public List<Moves> movesList;
 	ChessBoardFormation chess;
 
 	private void Start () {
@@ -31,15 +34,17 @@ public class MyPlayerScript : NetworkBehaviour {
 		}
 		attackMoves=new List<Moves>();
 		if(isServer){
-			GameObject g = GameObject.Instantiate(timerPrefab);
-			NetworkServer.Spawn(g);
+			timeObject = GameObject.Instantiate(timerPrefab);
+			timeTracker=timeObject.GetComponent<TimeTracker>();
+			NetworkServer.Spawn(timeObject);
+			//TODO Fix th authority problem.
 		}
 		initLocalVar();
 	}
 	private void initLocalVar(){
 		if(isLocalPlayer){
 			cam=Camera.main;
-			gameMoveListener=cam.gameObject.GetComponent<GameMoveListener>();
+			gameMoveListener=GameObject.Find("CheckBoard").GetComponent<GameMoveListener>();
 			chess=ChessBoardFormation.getInstance();
 			List<Point> onLoc;
 			onLoc=chess.TransFormToGame(!isServer);
@@ -87,18 +92,24 @@ public class MyPlayerScript : NetworkBehaviour {
 		return players;
 	}
 
-	public void sendMoves(Moves[] moves){
+	public void sendMoves(){
 		if(!isLocalPlayer)
 			return;
-		
+		Moves[] moves=movesList.ToArray();
 		if(isServer){
 			RpcMovePos(moves);
 		}else if(!isServer){
 			CmdMovePos(moves);
 		}
 	}
-
+	public void changeClientCountDown(bool b){
+		CmdchangeClientCountDown(b);
+	}
 //Remote Calls From Here
+	[Command]
+	private void CmdchangeClientCountDown(bool b){
+		timeTracker.playerCountDownClient=b;
+	}
 	[Command]
 	private void CmdMovePos(Moves[] moves){
 		Debug.Log("Cmd Move Pos : "+moves.Length);
@@ -138,7 +149,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
 		for(int i=0;i<moves.Length;i++){
-			if(moves[i].attackInd!=-1){
+			if(moves[i].attackDef==null){
 				players[moves[i].ind].x=moves[i].x;
 				players[moves[i].ind].y=moves[i].y;
 			}else{

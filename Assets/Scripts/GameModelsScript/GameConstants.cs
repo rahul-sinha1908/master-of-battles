@@ -6,20 +6,14 @@ namespace MasterOfBattles{
 		public int x;
 		public int y;
 	}
-	public struct PowerNameId{
-		public string name;
-		public string description;
-		public string explanationLink;
-		public int id;
-	};
+	
 	public struct PlayerDetails{
 		public short ind,x,y, playerType;
 	}
 
 	public struct Moves{
 		public short ind,x,y;
-		public short attackInd;
-		public int intensity;
+		public string attackDef;
 	};
 
 	public class GameContants{
