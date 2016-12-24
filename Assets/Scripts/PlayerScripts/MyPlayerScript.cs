@@ -33,6 +33,7 @@ public class MyPlayerScript : NetworkBehaviour {
 			transform.name="ServerPlayer";
 		}
 		attackMoves=new List<Moves>();
+		movesList=new List<Moves>();
 		if(isServer){
 			timeObject = GameObject.Instantiate(timerPrefab);
 			timeTracker=timeObject.GetComponent<TimeTracker>();
@@ -95,9 +96,19 @@ public class MyPlayerScript : NetworkBehaviour {
 	public void sendMoves(){
 		if(!isLocalPlayer)
 			return;
-		Moves[] moves=movesList.ToArray();
+		Moves[] moves;
+		if(movesList.Count>0){
+			moves=movesList.ToArray();
+		}else{
+			moves=new Moves[1];
+			moves[0].ind=5;
+			moves[0].x=5;
+			moves[0].y=5;
+			moves[0].attackDef="";
+		}
 		if(isServer){
 			RpcMovePos(moves);
+			//reinitCount();
 		}else if(!isServer){
 			CmdMovePos(moves);
 		}
@@ -105,15 +116,18 @@ public class MyPlayerScript : NetworkBehaviour {
 	public void changeClientCountDown(bool b){
 		CmdchangeClientCountDown(b);
 	}
+
 //Remote Calls From Here
+
 	[Command]
 	private void CmdchangeClientCountDown(bool b){
 		timeTracker.playerCountDownClient=b;
 	}
 	[Command]
 	private void CmdMovePos(Moves[] moves){
-		Debug.Log("Cmd Move Pos : "+moves.Length);
+		Debug.Log("Cmd Move Pos : "+moves.Length+" : "+moves[0].ind+" : "+moves[0].x+" : "+moves[0].y);
 		doAllThresholdMoves(moves);
+		//CmdreinitCount();
 	}
 	[Command]
 	private void CmdInitiatePlayers(PlayerDetails[] players){
@@ -131,8 +145,9 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void RpcMovePos(Moves[] moves){
 		if(isServer)
 			return;
-		Debug.Log("Rpc Move Pos : "+moves.Length);
+		Debug.Log("Rpc Move Pos : "+moves.Length+" : "+moves[0].ind+" : "+moves[0].x+" : "+moves[0].y);
 		doAllThresholdMoves(moves);
+		//CmdreinitCount();
 	}
 
 	[ClientRpc]
@@ -149,9 +164,12 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
 		for(int i=0;i<moves.Length;i++){
-			if(moves[i].attackDef==null){
+			Debug.Log("ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
+			if(moves[i].attackDef==""){
+				Debug.Log("Entered Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 				players[moves[i].ind].x=moves[i].x;
 				players[moves[i].ind].y=moves[i].y;
+				Debug.Log("Exit Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 			}else{
 				attackMoves.Add(moves[i]);
 			}
@@ -171,21 +189,26 @@ public class MyPlayerScript : NetworkBehaviour {
 		}
 	}
 	private bool comparePositions(GameObject g, PlayerDetails p){
-		if(g.transform.position.x==p.x*GameContants.boxSize && g.transform.position.y==p.y*GameContants.boxSize)
+		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
+		pos.x*=GameContants.boxSize;
+		pos.z*=GameContants.boxSize;
+		if(g.transform.position.x==pos.x && g.transform.position.z==pos.z)
 			return true;
 		return false;
 	}
 	private void Update () {
 		initOtherPlayer();
-		if(!isLocalPlayer)
-			return;
 
 		if(players!=null){
 			for(int i=0;i<players.Length;i++){
 				if(playerObjects[i]!=null){
-					if(comparePositions(playerObjects[i],players[i])){
+					if(!comparePositions(playerObjects[i],players[i])){
 						//TODO Do animation and stuffs
-						playerObjects[i].transform.position=(new Vector3(players[i].x,0, players[i].y))*GameContants.boxSize+playerHeight;
+						Debug.Log("It Got in For "+i);
+						Vector3 pos=new Vector3(players[i].x,0, players[i].y)+playerHeight+offset;
+						pos.x*=GameContants.boxSize;
+						pos.z*=GameContants.boxSize;
+						playerObjects[i].transform.position=pos;
 					}
 				}
 			}

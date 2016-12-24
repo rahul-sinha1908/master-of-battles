@@ -7,8 +7,8 @@ using MasterOfBattles;
 public class TimeTracker : NetworkBehaviour {
 
 	[SyncVar]
-	public float timeleft;
-
+	public int timeleft;
+	private float localTimeLeft;
 	[SyncVar]
 	public bool playerCountDownServer=false;
 	[SyncVar]
@@ -16,7 +16,7 @@ public class TimeTracker : NetworkBehaviour {
 
 	private GameObject serverPlayer, clientPlayer;
 	private MyPlayerScript serverPLayerScript, clientPlayerScript;
-	
+	private bool dataSend=true;
 	// Use this for initialization
 	void Start () {
 		initiateMyGamePlayers();
@@ -40,35 +40,37 @@ public class TimeTracker : NetworkBehaviour {
 	}
 
 	
-	[Command]
-	private void CmdreinitCount(){
-		timeleft=-1;
-		playerCountDownClient=false;
-		playerCountDownServer=false;
-	}
 	private void sendMoves(){
 		serverPLayerScript.sendMoves();
 		clientPlayerScript.sendMoves();
-		CmdreinitCount();
 	}
 	private void calculateTimeActions(){
 		if(playerCountDownClient && playerCountDownServer){
 				sendMoves();
 		}
 		if(isServer){
+			if(timeleft==0){
+				timeleft=-1;
+				playerCountDownClient=false;
+				playerCountDownServer=false;
+			}
 			if(!playerCountDownClient && !playerCountDownServer){
 				timeleft=-1;
 			}else if(!playerCountDownClient && playerCountDownServer){
 				if(timeleft==-1){
 					timeleft=GameContants.timeConstant;
+					localTimeLeft=timeleft;
 				}else{
-					timeleft-=Time.deltaTime;
+					localTimeLeft-=Time.deltaTime;
+					timeleft=(int)Mathf.Ceil(localTimeLeft);
 				}
 			}else if(playerCountDownClient && !playerCountDownServer){
 				if(timeleft==-1){
 					timeleft=GameContants.timeConstant;
+					localTimeLeft=timeleft;
 				}else{
-					timeleft-=Time.deltaTime;
+					localTimeLeft-=Time.deltaTime;
+					timeleft=(int)Mathf.Ceil(localTimeLeft);
 				}
 			}
 		}
@@ -78,13 +80,15 @@ public class TimeTracker : NetworkBehaviour {
 
 		calculateTimeActions();
 		if(timeleft!=-1){
-			if(timeleft<=0){
+			if(timeleft==0 && !dataSend){
 				sendMoves();
+				dataSend=true;
 			}
 			else{
 				//TODO Show the Canvas with time Left Bar and a cancel button too
 			}
 		}else{
+			dataSend=false;
 			//TODO Remove the time canvas and cancel button. Add the Accept Button
 		}
 	}
@@ -106,6 +110,8 @@ public class TimeTracker : NetworkBehaviour {
 		if(GUI.Button(new Rect(100,100,50,50),"Send Move")){
 			if(!isServer)
 				clientPlayerScript.changeClientCountDown(true);
+			else
+				playerCountDownServer=true;
 		}
 	}
 }
