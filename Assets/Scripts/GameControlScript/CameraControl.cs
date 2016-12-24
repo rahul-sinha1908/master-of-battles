@@ -6,20 +6,19 @@ using MasterOfBattles;
 
 public class CameraControl : MonoBehaviour {
 
-	GameObject checkBoard;
+	[SerializeField]
+	private GameObject checkBoardPrefab;
+	private GameObject checkBoard;
 	
 	// Use this for initialization
 	void Start () {
-		checkBoard = GameObject.Find ("CheckBoard");
 		transform.position=GameContants.boxSize*transform.position;
+		checkBoard= GameObject.Instantiate(checkBoardPrefab);
+		checkBoard.name="CheckBoard";
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(checkBoard!=null)
-			transform.LookAt (checkBoard.transform.position);
-		else{
-			checkBoard = GameObject.Find ("CheckBoard");
-		}
+		transform.LookAt (checkBoard.transform.position);
 	}
 }

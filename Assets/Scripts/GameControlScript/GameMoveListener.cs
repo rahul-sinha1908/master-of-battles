@@ -8,7 +8,8 @@ public class GameMoveListener : MonoBehaviour {
 
 	private int offsetHitX=GameContants.sizeOfBoardX/2;
 	private int offsetHitY=GameContants.sizeOfBoardY/2;
-
+	[SerializeField]
+	private LayerMask mask;
 	private int boxX,boxY;
 	private MyPlayerScript myPlayerScript;
 	private PlayerDetails[] players;
@@ -74,7 +75,7 @@ public class GameMoveListener : MonoBehaviour {
 	private void performActionOnHit(Ray ray){
 		RaycastHit hit;
 		//TODO Put a layer mask on this.
-		if(Physics.Raycast(ray,out hit,100)){
+		if(Physics.Raycast(ray,out hit,10000,mask)){
 			//TODO Divide this by a constant if you want to increase the area of the play
 			boxX=(int)Mathf.Floor(hit.point.x/GameContants.boxSize)+offsetHitX;
 			boxY=(int)Mathf.Floor(hit.point.z/GameContants.boxSize)+offsetHitY;

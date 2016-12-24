@@ -18,6 +18,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private GameObject[] playerObjects;
 	private List<Moves> attackMoves;
 	public List<Moves> movesList;
+	public float moveSpeed=15f; 
 	ChessBoardFormation chess;
 
 	private void Start () {		
@@ -196,6 +197,26 @@ public class MyPlayerScript : NetworkBehaviour {
 			return true;
 		return false;
 	}
+	private void moveMyPlayer(GameObject g, PlayerDetails p){
+		//TODO Do animation and stuffs
+		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
+		pos.x*=GameContants.boxSize;
+		pos.z*=GameContants.boxSize;
+		Vector3 ipos=g.transform.position;
+		Vector3 dir =  (pos-ipos);
+		dir.Normalize();
+		CharacterController cc=g.GetComponent<CharacterController>();
+		if(Vector3.Distance(ipos,pos)<1.5){
+			g.transform.position=pos;
+		}else
+			cc.Move(dir);
+		
+		// if(dir.sqrMagnitude>moveSpeed*moveSpeed*Time.deltaTime*Time.deltaTime)
+		// 	g.transform.position=ipos+dir*moveSpeed*Time.deltaTime;
+		// else
+		// 	g.transform.position=pos;
+		//playerObjects[i].transform.GetComponent<Rigidbody>().MovePosition((pos - playerObjects[i].transform.position)*moveSpeed*Time.deltaTime);
+	}
 	private void Update () {
 		initOtherPlayer();
 
@@ -203,12 +224,7 @@ public class MyPlayerScript : NetworkBehaviour {
 			for(int i=0;i<players.Length;i++){
 				if(playerObjects[i]!=null){
 					if(!comparePositions(playerObjects[i],players[i])){
-						//TODO Do animation and stuffs
-						Debug.Log("It Got in For "+i);
-						Vector3 pos=new Vector3(players[i].x,0, players[i].y)+playerHeight+offset;
-						pos.x*=GameContants.boxSize;
-						pos.z*=GameContants.boxSize;
-						playerObjects[i].transform.position=pos;
+						moveMyPlayer(playerObjects[i], players[i]);
 					}
 				}
 			}

@@ -20,9 +20,12 @@ public class PlayGroundScript : MonoBehaviour {
 		meshCollider.sharedMesh=mesh;
 	}
 	private void generateVertices(){
-		vertices = new Vector3[(GameContants.sizeOfBoardX) * (GameContants.sizeOfBoardY)];
 		int xSize=GameContants.sizeOfBoardX,ySize=GameContants.sizeOfBoardY;
+		xSize+=1;
+		ySize+=1;
+		vertices = new Vector3[xSize*ySize];
 		planeOffset=new Vector3(-xSize/2*GameContants.boxSize,0,-ySize/2*GameContants.boxSize);
+		
 		for (int i = 0, y = 0; y < ySize; y++) {
 			for (int x = 0; x < xSize; x++, i++) {
 				vertices[i] = new Vector3(x*GameContants.boxSize,0 ,y*GameContants.boxSize)+planeOffset;
@@ -31,7 +34,7 @@ public class PlayGroundScript : MonoBehaviour {
 		mesh.vertices=vertices;
 	}
 	private void generateTriangles(){
-		int xSize=GameContants.sizeOfBoardX-1,ySize=GameContants.sizeOfBoardY-1;
+		int xSize=GameContants.sizeOfBoardX,ySize=GameContants.sizeOfBoardY;
 		int[] triangles = new int[xSize*ySize * 6];
 		for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++) {
 			//break;
