@@ -7,12 +7,17 @@ public class PlayGroundScript : MonoBehaviour {
 
 	private Mesh mesh;
 	private MeshCollider meshCollider;
+	private MeshRenderer meshRenderer;
 	private Vector3[] vertices;
 	private Vector3 planeOffset;
 	private void Awake()
 	{
 		GetComponent<MeshFilter>().mesh=mesh=new Mesh();
 		meshCollider=GetComponent<MeshCollider>();
+		meshRenderer=GetComponent<MeshRenderer>();
+		// Color c=meshRenderer.material.color;
+		// c.a=0.2f;
+		// meshRenderer.material.color=c;
 		mesh.name="My Play Ground";
 		generateVertices();
 		generateTriangles();
@@ -31,7 +36,19 @@ public class PlayGroundScript : MonoBehaviour {
 				vertices[i] = new Vector3(x*GameContants.boxSize,0 ,y*GameContants.boxSize)+planeOffset;
 			}
 		}
-		mesh.vertices=vertices;
+		xSize--;ySize--;
+		Vector2[] uv = new Vector2[vertices.Length];
+		Vector4[] tangents = new Vector4[vertices.Length];
+		Vector4 tangent = new Vector4(1f, 0f, 0f, -1f);
+		for (int i = 0, y = 0; y <= ySize; y++) {
+			for (int x = 0; x <= xSize; x++, i++) {
+				uv[i] = new Vector2((float)x / xSize, (float)y / ySize);
+				tangents[i] = tangent;
+			}
+		}
+		mesh.vertices = vertices;
+		mesh.uv = uv;
+		mesh.tangents = tangents;
 	}
 	private void generateTriangles(){
 		int xSize=GameContants.sizeOfBoardX,ySize=GameContants.sizeOfBoardY;
