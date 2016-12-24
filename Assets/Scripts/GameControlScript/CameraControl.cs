@@ -18,5 +18,8 @@ public class CameraControl : MonoBehaviour {
 	void Update () {
 		if(checkBoard!=null)
 			transform.LookAt (checkBoard.transform.position);
+		else{
+			checkBoard = GameObject.Find ("CheckBoard");
+		}
 	}
 }

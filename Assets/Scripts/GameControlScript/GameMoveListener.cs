@@ -25,7 +25,7 @@ public class GameMoveListener : MonoBehaviour {
 		// Store both touches.
 		Touch touchZero = Input.GetTouch(0);
 		Touch touchOne = Input.GetTouch(1);
-		
+
 		// Find the position in the previous frame of each touch.
 		Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
 		Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
@@ -84,7 +84,7 @@ public class GameMoveListener : MonoBehaviour {
 	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj){
 		if(!isServer){
 			//TODO change the location of the camera
-			transform.position=transform.position-2*(new Vector3(0,0,transform.position.z));
+			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
 		}
 		myPlayerScript=obj;
 		players=myPlayerScript.getPlayerDetails();

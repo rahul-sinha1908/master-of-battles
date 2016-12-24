@@ -20,7 +20,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	public List<Moves> movesList;
 	ChessBoardFormation chess;
 
-	private void Start () {
+	private void Start () {		
 		Debug.Log("My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
 		if(isServer && isLocalPlayer){
 			transform.name="ServerPlayer";
@@ -104,7 +104,7 @@ public class MyPlayerScript : NetworkBehaviour {
 			moves[0].ind=5;
 			moves[0].x=5;
 			moves[0].y=5;
-			moves[0].attackDef="";
+			//return;
 		}
 		if(isServer){
 			RpcMovePos(moves);
