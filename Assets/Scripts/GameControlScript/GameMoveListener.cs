@@ -129,6 +129,8 @@ public class GameMoveListener : MonoBehaviour {
 					selectPlayer=true;
 				}
 			}else if(hit.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects")){
+				if(hit.collider.gameObject.tag!="MyTeam")
+					return;
 				string name = hit.collider.gameObject.name;
 				int k=name.LastIndexOf('m')+1;
 				int ind= Int32.Parse(name.Substring(k));
