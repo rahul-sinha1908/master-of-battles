@@ -12,7 +12,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private TimeTracker timeTracker;
 	public Camera cam;
 	private GameMoveListener gameMoveListener;
-	private Vector3 offset=new Vector3(-14.5f,0,-14.5f);
+	private Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
 	private Vector3 playerHeight=new Vector3(0,1,0);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
