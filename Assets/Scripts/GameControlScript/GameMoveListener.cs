@@ -116,8 +116,16 @@ public class GameMoveListener : MonoBehaviour {
 						searchPossibleMoves(selectedPlayerInd,true);
 					}
 				}else{
-					players[selectedPlayerInd].x=(short)p.x;
-					players[selectedPlayerInd].y=(short)p.y;
+					if(move){
+						players[selectedPlayerInd].x=(short)p.x;
+						players[selectedPlayerInd].y=(short)p.y;
+						Moves m;
+						m.ind=(short)selectedPlayerInd;
+						m.x=(short)p.x;
+						m.y=(short)p.y;
+						m.attackDef="";
+						moves.Add(m);
+					}
 					selectPlayer=true;
 				}
 			}else if(hit.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects")){
@@ -148,6 +156,7 @@ public class GameMoveListener : MonoBehaviour {
 		if(!isServer){
 			//TODO change the location of the camera
 			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
+			cam.transform.LookAt(transform.position);
 		}
 		myPlayerScript=obj;
 		players=myPlayerScript.getPlayerDetails();

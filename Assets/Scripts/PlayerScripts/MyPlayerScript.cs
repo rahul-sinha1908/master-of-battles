@@ -100,12 +100,13 @@ public class MyPlayerScript : NetworkBehaviour {
 		Moves[] moves;
 		if(movesList.Count>0){
 			moves=movesList.ToArray();
+			movesList.Clear();
 		}else{
-			moves=new Moves[1];
-			moves[0].ind=5;
-			moves[0].x=5;
-			moves[0].y=5;
-			//return;
+			// moves=new Moves[1];
+			// moves[0].ind=5;
+			// moves[0].x=5;
+			// moves[0].y=5;
+			return;
 		}
 		if(isServer){
 			RpcMovePos(moves);
