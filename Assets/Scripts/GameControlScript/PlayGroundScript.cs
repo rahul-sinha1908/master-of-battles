@@ -29,7 +29,7 @@ public class PlayGroundScript : MonoBehaviour {
 		xSize+=1;
 		ySize+=1;
 		vertices = new Vector3[xSize*ySize];
-		planeOffset=new Vector3(-xSize/2*GameContants.boxSize,0,-ySize/2*GameContants.boxSize);
+		planeOffset=new Vector3(-xSize/2*GameContants.boxSize,0.1f,-ySize/2*GameContants.boxSize);
 		
 		for (int i = 0, y = 0; y < ySize; y++) {
 			for (int x = 0; x < xSize; x++, i++) {
@@ -42,7 +42,18 @@ public class PlayGroundScript : MonoBehaviour {
 		Vector4 tangent = new Vector4(1f, 0f, 0f, -1f);
 		for (int i = 0, y = 0; y <= ySize; y++) {
 			for (int x = 0; x <= xSize; x++, i++) {
-				uv[i] = new Vector2((float)x / xSize, (float)y / ySize);
+				//uv[i] = new Vector2((float)x / xSize, (float)y / ySize);
+				float x1=x%2,y1=y%2;
+				if(x1==0)
+					x1=0.05f;
+				else
+					x1=0.95f;
+				if(y1==0)
+					y1=0.05f;
+				else
+					y1=0.95f;
+
+				uv[i] = new Vector2(x1, y1);
 				tangents[i] = tangent;
 			}
 		}

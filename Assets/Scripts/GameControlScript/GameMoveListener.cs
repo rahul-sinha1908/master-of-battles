@@ -16,6 +16,8 @@ public class GameMoveListener : MonoBehaviour {
 	private List<Moves> moves;
 	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f;
 	private Camera cam;
+	[SerializeField]
+	private CheckSelectScript selectScript;
 	// Use this for initialization
 	void Start () {
 		cam = Camera.main;
@@ -80,6 +82,10 @@ public class GameMoveListener : MonoBehaviour {
 			boxX=(int)Mathf.Floor(hit.point.x/GameContants.boxSize)+offsetHitX;
 			boxY=(int)Mathf.Floor(hit.point.z/GameContants.boxSize)+offsetHitY;
 			Debug.Log(hit.point+" : "+boxX+" : "+boxY);
+			Point p;
+			p.x=boxX;
+			p.y=boxY;
+			selectScript.addSelectedTiles(p,0);
 		}
 	}
 	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj){
