@@ -15,10 +15,11 @@ public class CameraControl : MonoBehaviour {
 		transform.position=GameContants.boxSize*transform.position;
 		checkBoard= GameObject.Instantiate(checkBoardPrefab);
 		checkBoard.name="CheckBoard";
+		transform.LookAt (checkBoard.transform.position);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		transform.LookAt (checkBoard.transform.position);
+		
 	}
 }

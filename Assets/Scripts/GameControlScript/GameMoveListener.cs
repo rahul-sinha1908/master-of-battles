@@ -14,13 +14,16 @@ public class GameMoveListener : MonoBehaviour {
 	private MyPlayerScript myPlayerScript;
 	private PlayerDetails[] players;
 	private List<Moves> moves;
-	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f;
+	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f, camPanSpeed=1f, defaultFeildOfView;
+	private Vector3 defaultCamVector;	
 	private Camera cam;
 	[SerializeField]
 	private CheckSelectScript selectScript;
 	// Use this for initialization
 	void Start () {
 		cam = Camera.main;
+		defaultCamVector=cam.transform.position;
+		defaultFeildOfView=cam.fieldOfView;
 	}
 	
 	private void detectZoom(){
@@ -62,7 +65,11 @@ public class GameMoveListener : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if(Input.touchCount==1){
+		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
+			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
+			cam.transform.Translate(-touchDeltaPosition.x * camPanSpeed, 0, -touchDeltaPosition.y * camPanSpeed);
+			//cam.transform.position=Vector3.LerpUnclamped()
+        }else if(Input.touchCount==1){
 			Debug.Log("Touch Count : "+Input.touchCount);
 			Ray ray=Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
 			performActionOnHit(ray);
@@ -73,7 +80,11 @@ public class GameMoveListener : MonoBehaviour {
 			performActionOnHit(ray);
 		}
 	}
-
+	private void setDefaultCameraPostion(){
+		cam.transform.position=defaultCamVector;
+		cam.transform.LookAt(transform.position);
+		cam.fieldOfView=defaultFeildOfView;
+	}
 	private void performActionOnHit(Ray ray){
 		RaycastHit hit;
 		//TODO Put a layer mask on this.
