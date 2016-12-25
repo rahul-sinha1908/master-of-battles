@@ -4,6 +4,12 @@ using UnityEngine;
 using MasterOfBattles;
 
 public class CheckSelectScript : MonoBehaviour {
+
+	public struct Reference{
+		public Point p;
+		public int colorInd;
+	};
+	List<Reference> listRef=new List<Reference>();
 	private Mesh mesh;
 	private MeshCollider meshCollider;
 	private MeshRenderer meshRenderer;
@@ -50,6 +56,9 @@ public class CheckSelectScript : MonoBehaviour {
 		// 	Debug.Log(vertices[i]);
 		// for(int i=0;i<triangles.Count;i++)
 		// 	Debug.Log(triangles[i]);
+	}
+
+	private void refreshMesh(){
 		mesh.triangles=null;
 		mesh.uv=null;
 		mesh.vertices=null;
@@ -59,35 +68,72 @@ public class CheckSelectScript : MonoBehaviour {
 		mesh.RecalculateNormals();
 		//mesh.tangents = tangents;
 	}
-
 	public void showSelectedTiles(List<Point> points, int colorInd){
 		vertices.Clear();
 		triangles.Clear();
 		uv.Clear();
+		listRef.Clear();
 
 		for(int i=0;i<points.Count;i++){
-			generateVerticesAndTriangle(points[i].x,points[i].y);
+			int k=checkExisting(points[i], colorInd);
+			if(k==-1)
+				generateVerticesAndTriangle(points[i].x,points[i].y);
 		}
+		refreshMesh();
 	}
 	public void showSelectedTiles(Point point, int colorInd){
-		vertices.Clear();
-		triangles.Clear();
-		uv.Clear();
-		generateVerticesAndTriangle(point.x,point.y);
+		List<Point> l=new List<Point>();
+		l.Add(point);
+		showSelectedTiles(l,colorInd);
 	}
 	public void addSelectedTiles(List<Point> points, int colorInd){
-		vertices.Clear();
-		triangles.Clear();
-		uv.Clear();
 
 		for(int i=0;i<points.Count;i++){
-			generateVerticesAndTriangle(points[i].x,points[i].y);
+			int k=checkExisting(points[i], colorInd);
+			Debug.Log("K = "+k);
+			if(k==-1)
+				generateVerticesAndTriangle(points[i].x,points[i].y);
+			else{
+				removeExisting(k);
+			}
 		}
+		refreshMesh();
 	}
 	public void addSelectedTiles(Point point, int colorInd){
-		generateVerticesAndTriangle(point.x,point.y);
+		List<Point> l=new List<Point>();
+		l.Add(point);
+		addSelectedTiles(l,colorInd);
 	}
 
+	private int checkExisting(Point p, int colorInd){
+		for(int i=0;i<listRef.Count;i++){
+			if(listRef[i].p.x==p.x && listRef[i].p.y==p.y)
+				return i;
+		}
+		Reference r;
+		r.p=p;
+		r.colorInd=colorInd;
+		listRef.Add(r);
+		return -1;
+	}
+	private void removeExisting(int i){
+		List<Point> list=new List<Point>();
+		List<int> col=new List<int>();
+		for(int k=0;k<listRef.Count;k++){
+			if(k!=i){
+				list.Add(listRef[k].p);
+				col.Add(listRef[k].colorInd);
+			}
+		}
+		listRef.Clear();
+		triangles.Clear();
+		uv.Clear();
+		vertices.Clear();
+		for(i=0;i<list.Count;i++){
+			addSelectedTiles(list[i],col[i]);
+		}
+			
+	}
 	// Update is called once per frame
 	void Update () {
 		
