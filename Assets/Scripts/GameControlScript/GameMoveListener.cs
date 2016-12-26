@@ -72,12 +72,14 @@ public class GameMoveListener : MonoBehaviour {
 
 	private IEnumerator InputListener() 
 	{
+		trackClicks=true;
 		while(trackClicks)
 		{ //Run as long as this is active
+			//Debug.LogError("It Entered Here : "+trackClicks);
 			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began)
 				yield return ClickEvent(Input.GetTouch(0).position);
 				//yield return ClickEvent();
-			else if(Input.GetMouseButtonDown(0))
+			else if(CrossPlatformInputManager.GetButtonDown("Fire1"))
 				yield return ClickEvent(Input.mousePosition);
 				//yield return ClickEvent();
 
@@ -88,44 +90,39 @@ public class GameMoveListener : MonoBehaviour {
 	private IEnumerator ClickEvent(Vector2 vect)
 	{	//Debug.Log("It Came here");
 		//pause a frame so you don't pick up the same mouse down event.
+		//Debug.LogError("It Entered Here : "+vect);
 		yield return new WaitForEndOfFrame();
-		bool clicked=true;
 		float count = 0f;
 		while(count < doubleClickTimeLimit)
 		{
 			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
 				if(Vector2.Distance(vect, Input.GetTouch(0).position)<5)
 					DoubleClick(vect);
-				else{
-					clicked=false;
-				}
 				yield break;
 			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
-				clicked=false;
 				yield break;
 			}
-			if(Input.GetMouseButtonDown(0))
+			else if(CrossPlatformInputManager.GetButtonDown("Fire1"))
 			{
+				//Debug.LogError("It Entered Here3 : "+CrossPlatformInputManager.GetButtonDown("Fire1"));
 				if(Vector2.Distance(vect, Input.mousePosition)<5)
 					DoubleClick(vect);
-				else
-					clicked=false;
 				yield break;
-			}else if(Input.GetMouseButton(0)){
+			}else if(CrossPlatformInputManager.GetButton("Fire1")){
 				if(Vector2.Distance(vect, Input.mousePosition)>5){
-					clicked=false;
 					yield break;
 				}
 			}
 			count += Time.deltaTime;// increment counter by change in time between frames
 			yield return null; // wait for the next frame
 		}
-		if(clicked)
-			SingleClick(vect);
+		//Debug.LogError("It Entered Here2 : ");
+		SingleClick(vect);
 	}
 
 	private void SingleClick(Vector2 vect)
 	{	
+		//Debug.LogError("2 : "+vect);
 		Debug.Log("Single Click");
 		Ray ray;
 		ray=Camera.main.ScreenPointToRay(vect);
@@ -134,12 +131,14 @@ public class GameMoveListener : MonoBehaviour {
 
 	private void DoubleClick(Vector2 vect)
 	{
+		//Debug.LogError("3 : "+vect);
+
+		//TODO Double Tap for Attack Sequence
 		Debug.Log("Double Click");
 	}
 
 	// Update is called once per frame
 	void Update () {
-		//TODO Double Tap for Attack Sequence
 		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
 			if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x+touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))

@@ -107,7 +107,13 @@ public class TimeTracker : NetworkBehaviour {
 	
 	private void OnGUI()
 	{
-		if(GUI.Button(new Rect(100,100,50,50),"Send Move")){
+		string s="Time Left : "+timeleft+" sec";
+		int a=60;
+		if(timeleft==-1){
+			a=0;
+			s="Send Moves";
+		}
+		if(GUI.Button(new Rect(100,100+a,100,50),s)){
 			if(!isServer)
 				clientPlayerScript.changeClientCountDown(true);
 			else
