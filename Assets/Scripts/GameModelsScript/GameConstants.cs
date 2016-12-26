@@ -24,4 +24,9 @@ namespace MasterOfBattles{
 		public static int boxSize=3;
 		public static int timeConstant=10;
 	}
+	public class BoardConstants{
+		public static int Select=0;
+		public static int Move=1;
+		public static int Attack=2;
+	} 
 }

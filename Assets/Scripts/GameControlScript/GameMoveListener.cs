@@ -18,15 +18,19 @@ public class GameMoveListener : MonoBehaviour {
 	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f, camPanSpeed=1f, defaultFeildOfView;
 	private Vector3 defaultCamVector;	
 	private Camera cam;
+	private bool trackClicks=true;
 	[SerializeField]
 	private CheckSelectScript selectScript;
 	private bool selectPlayer=true;
 	private int selectedPlayerInd=-1;
+	private float doubleClickTimeLimit=0.3f;
 	// Use this for initialization
 	void Start () {
 		cam = Camera.main;
 		defaultCamVector=cam.transform.position;
 		defaultFeildOfView=cam.fieldOfView;
+
+		StartCoroutine(InputListener());
 	}
 	
 	private void detectZoom(){
@@ -66,6 +70,73 @@ public class GameMoveListener : MonoBehaviour {
 
 	}
 
+	private IEnumerator InputListener() 
+	{
+		while(trackClicks)
+		{ //Run as long as this is active
+			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began)
+				yield return ClickEvent(Input.GetTouch(0).position);
+				//yield return ClickEvent();
+			else if(Input.GetMouseButtonDown(0))
+				yield return ClickEvent(Input.mousePosition);
+				//yield return ClickEvent();
+
+			yield return null;
+		}
+	}
+
+	private IEnumerator ClickEvent(Vector2 vect)
+	{	//Debug.Log("It Came here");
+		//pause a frame so you don't pick up the same mouse down event.
+		yield return new WaitForEndOfFrame();
+		bool clicked=true;
+		float count = 0f;
+		while(count < doubleClickTimeLimit)
+		{
+			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
+				if(Vector2.Distance(vect, Input.GetTouch(0).position)<5)
+					DoubleClick(vect);
+				else{
+					clicked=false;
+				}
+				yield break;
+			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
+				clicked=false;
+				yield break;
+			}
+			if(Input.GetMouseButtonDown(0))
+			{
+				if(Vector2.Distance(vect, Input.mousePosition)<5)
+					DoubleClick(vect);
+				else
+					clicked=false;
+				yield break;
+			}else if(Input.GetMouseButton(0)){
+				if(Vector2.Distance(vect, Input.mousePosition)>5){
+					clicked=false;
+					yield break;
+				}
+			}
+			count += Time.deltaTime;// increment counter by change in time between frames
+			yield return null; // wait for the next frame
+		}
+		if(clicked)
+			SingleClick(vect);
+	}
+
+	private void SingleClick(Vector2 vect)
+	{	
+		Debug.Log("Single Click");
+		Ray ray;
+		ray=Camera.main.ScreenPointToRay(vect);
+		performActionOnHit(ray, true);
+	}
+
+	private void DoubleClick(Vector2 vect)
+	{
+		Debug.Log("Double Click");
+	}
+
 	// Update is called once per frame
 	void Update () {
 		//TODO Double Tap for Attack Sequence
@@ -77,16 +148,9 @@ public class GameMoveListener : MonoBehaviour {
 			if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.boxSize && Mathf.Abs(cam.transform.position.z+touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
 				touchDeltaPosition.y=0;
 			cam.transform.Translate(-touchDeltaPosition.x * camPanSpeed, 0, -touchDeltaPosition.y * camPanSpeed, Space.World);
-        }else if(Input.touchCount==1 && Input.GetTouch(0).phase == TouchPhase.Began){
-			Debug.Log("Touch Count : "+Input.touchCount);
-			Ray ray=Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-			performActionOnHit(ray, true);
-		}else if (Input.touchCount == 2){
+        }else if (Input.touchCount == 2){
 			detectZoom();
-        }else if(CrossPlatformInputManager.GetButtonDown("Fire1")){
-			Ray ray=Camera.main.ScreenPointToRay(CrossPlatformInputManager.mousePosition);
-			performActionOnHit(ray, true);
-		}
+        }
 	}
 	private void setDefaultCameraPostion(){
 		cam.transform.position=defaultCamVector;
@@ -104,14 +168,14 @@ public class GameMoveListener : MonoBehaviour {
 			Point p;
 			p.x=boxX;
 			p.y=boxY;
-			if(hit.collider.gameObject.layer==LayerMask.NameToLayer("CheckBoard")){
+			if(hit.collider.gameObject.layer==LayerMask.NameToLayer("CheckBoard") || hit.collider.gameObject.tag!="MyTeam"){
 				int k=checKThePlayerAt(p);
 				if(k>=0)
 					selectPlayer=true;
 				if(selectPlayer){
 					selectedPlayerInd=k;
 					if(selectedPlayerInd>=0){
-						selectScript.showSelectedTiles(p,0);
+						selectScript.showSelectedTiles(p,BoardConstants.Select);
 						selectPlayer=false;
 						searchPossibleMoves(selectedPlayerInd,true);
 					}
@@ -129,8 +193,6 @@ public class GameMoveListener : MonoBehaviour {
 					selectPlayer=true;
 				}
 			}else if(hit.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects")){
-				if(hit.collider.gameObject.tag!="MyTeam")
-					return;
 				string name = hit.collider.gameObject.name;
 				int k=name.LastIndexOf('m')+1;
 				int ind= Int32.Parse(name.Substring(k));
@@ -138,14 +200,28 @@ public class GameMoveListener : MonoBehaviour {
 				p.x=players[ind].x;
 				p.y=players[ind].y;
 				selectedPlayerInd=ind;
-				selectScript.showSelectedTiles(p,0);
+				selectScript.showSelectedTiles(p,BoardConstants.Select);
 				selectPlayer=false;
 				searchPossibleMoves(selectedPlayerInd,true);
 			}
 		}
 	}
 	private void searchPossibleMoves(int ind, bool move){
-
+		List<Point> list=new List<Point>();
+		int x=players[ind].x, y=players[ind].y;
+		for(int i=x-1;i<=x+1;i++){
+			for(int j=y-1;j<=y+1;j++){
+				if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || y>=GameContants.sizeOfBoardY)
+					continue;
+				if(i==x && j==y)
+					continue;
+				Point p;
+				p.x=i;
+				p.y=j;
+				list.Add(p);
+			}
+		}
+		selectScript.addSelectedTiles(list,BoardConstants.Move);
 	}
 	private int checKThePlayerAt(Point p){
 		for(int i=0;i<players.Length;i++){

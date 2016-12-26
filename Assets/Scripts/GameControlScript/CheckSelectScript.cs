@@ -30,19 +30,28 @@ public class CheckSelectScript : MonoBehaviour {
 		//generateTriangles();
 	}
 
-	private void generateVerticesAndTriangle(int x, int y){
+	private void generateVerticesAndTriangle(int x, int y, int colorInd){
 		x=x-GameContants.sizeOfBoardX/2;
 		y=y-GameContants.sizeOfBoardY/2;
 		x*=GameContants.boxSize;
 		y*=GameContants.boxSize;
 		vertices.Add(new Vector3(x,0,y)+heightOffset);
-		uv.Add(new Vector2(0,0));
 		vertices.Add(new Vector3(x+GameContants.boxSize,0,y)+heightOffset);
-		uv.Add(new Vector2(1,0));
 		vertices.Add(new Vector3(x,0,y+GameContants.boxSize)+heightOffset);
-		uv.Add(new Vector2(0,1));
 		vertices.Add(new Vector3(x+GameContants.boxSize,0,y+GameContants.boxSize)+heightOffset);
-		uv.Add(new Vector2(1,1));
+		
+		if(colorInd==BoardConstants.Select){
+			uv.Add(new Vector2(0,0.5f));
+			uv.Add(new Vector2(0.5f,0.5f));
+			uv.Add(new Vector2(0,1f));
+			uv.Add(new Vector2(0.5f,1f));
+		}else if(colorInd==BoardConstants.Move){
+			uv.Add(new Vector2(0.5f,0.5f));
+			uv.Add(new Vector2(1f,0.5f));
+			uv.Add(new Vector2(0.5f,1f));
+			uv.Add(new Vector2(1f,1f));
+		}
+
 		int vi=vertices.Count-4;
 		for(int k=0;k<6;k++)
 			triangles.Add(0);
@@ -77,7 +86,7 @@ public class CheckSelectScript : MonoBehaviour {
 		for(int i=0;i<points.Count;i++){
 			int k=checkExisting(points[i], colorInd);
 			if(k==-1)
-				generateVerticesAndTriangle(points[i].x,points[i].y);
+				generateVerticesAndTriangle(points[i].x,points[i].y, colorInd);
 		}
 		refreshMesh();
 	}
@@ -92,7 +101,7 @@ public class CheckSelectScript : MonoBehaviour {
 			int k=checkExisting(points[i], colorInd);
 			Debug.Log("K = "+k);
 			if(k==-1)
-				generateVerticesAndTriangle(points[i].x,points[i].y);
+				generateVerticesAndTriangle(points[i].x,points[i].y, colorInd);
 			else{
 				removeExisting(k);
 			}
