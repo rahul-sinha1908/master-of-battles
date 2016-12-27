@@ -11,13 +11,15 @@ public class GameMoveListener : MonoBehaviour {
 	private int offsetHitY=GameContants.sizeOfBoardY/2;
 	[SerializeField]
 	private LayerMask mask;
+	private bool isServer;
 	private int boxX,boxY;
 	private MyPlayerScript myPlayerScript;
-	private PlayerDetails[] players;
+	private PlayerDetails[] players, backUpMoves;
 	private List<Moves> moves;
 	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f, camPanSpeed=1f, defaultFeildOfView;
 	private Vector3 defaultCamVector;	
 	private Camera cam;
+	private bool isClicksActive, applyeRestrictions;
 	private bool trackClicks=true;
 	private Vector2 trackClickVect;
 	private float trackClickCount=0f;
@@ -33,6 +35,7 @@ public class GameMoveListener : MonoBehaviour {
 		defaultFeildOfView=cam.fieldOfView;
 
 		trackClicks=false;
+		isClicksActive=true;
 	}
 	
 	private void detectZoom(){
@@ -72,24 +75,28 @@ public class GameMoveListener : MonoBehaviour {
 
 	}
 
+	private bool compareTwoPlayerDetails(PlayerDetails a, PlayerDetails b){
+		if(a.x==b.x && a.y==b.y)
+			return true;
+		return false;
+	}
 	private void SingleClick(Vector2 vect)
 	{	
-		//Debug.LogError("2 : "+vect);
 		Debug.Log("Single Click");
 		Ray ray;
 		ray=Camera.main.ScreenPointToRay(vect);
 		performActionOnHit(ray, true);
 	}
-
 	private void DoubleClick(Vector2 vect)
 	{
-		//Debug.LogError("3 : "+vect);
-
-		//TODO Double Tap for Attack Sequence
 		Debug.Log("Double Click");
+		Ray ray;
+		ray=Camera.main.ScreenPointToRay(vect);
+		performActionOnHit(ray, false);
 	}
-
 	private void checkClickListener(){
+		if(!isClicksActive)
+			return;
 		if(trackClicks==false){
 			//TODO DO the function for assigning the initial values
 			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
@@ -168,30 +175,42 @@ public class GameMoveListener : MonoBehaviour {
 				if(selectPlayer){
 					selectedPlayerInd=k;
 					if(selectedPlayerInd>=0){
+						if(applyeRestrictions){
+							p.x=backUpMoves[k].x;
+							p.y=backUpMoves[k].y;
+						}
 						selectScript.showSelectedTiles(p,BoardConstants.Select);
 						selectPlayer=false;
 						searchPossibleMoves(selectedPlayerInd,true);
 					}
 				}else{
 					if(move){
+						int s=selectedPlayerInd;
+						//TODO Instead of using 1 constant use the player properties to get the max moves.
+						if(applyeRestrictions && (Math.Abs(p.x-backUpMoves[s].x)>1 || Math.Abs(p.y-backUpMoves[s].y)>1))
+							return;
+						else if(!applyeRestrictions){
+							//DONE Give the condition for restricting too much of move
+							int bot=0, top=3;
+							if(!isServer){
+								top=GameContants.sizeOfBoardY;
+								bot=top-3;
+							}
+							if(p.y<bot || p.y>=top)
+								return;
+						}
 						players[selectedPlayerInd].x=(short)p.x;
 						players[selectedPlayerInd].y=(short)p.y;
-						Moves m;
-						m.ind=(short)selectedPlayerInd;
-						m.x=(short)p.x;
-						m.y=(short)p.y;
-						m.attackDef="";
-						moves.Add(m);
 					}
-					selectPlayer=true;
+					//selectPlayer=true;
 				}
 			}else if(hit.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects")){
 				string name = hit.collider.gameObject.name;
 				int k=name.LastIndexOf('m')+1;
 				int ind= Int32.Parse(name.Substring(k));
 				Debug.Log("Selected Player : "+ind);
-				p.x=players[ind].x;
-				p.y=players[ind].y;
+				p.x=backUpMoves[ind].x;
+				p.y=backUpMoves[ind].y;
 				selectedPlayerInd=ind;
 				selectScript.showSelectedTiles(p,BoardConstants.Select);
 				selectPlayer=false;
@@ -201,17 +220,37 @@ public class GameMoveListener : MonoBehaviour {
 	}
 	private void searchPossibleMoves(int ind, bool move){
 		List<Point> list=new List<Point>();
-		int x=players[ind].x, y=players[ind].y;
-		for(int i=x-1;i<=x+1;i++){
-			for(int j=y-1;j<=y+1;j++){
-				if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || y>=GameContants.sizeOfBoardY)
-					continue;
-				if(i==x && j==y)
-					continue;
-				Point p;
-				p.x=i;
-				p.y=j;
-				list.Add(p);
+		int x=backUpMoves[ind].x, y=backUpMoves[ind].y;
+		if(applyeRestrictions){
+			for(int i=x-1;i<=x+1;i++){
+				for(int j=y-1;j<=y+1;j++){
+					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || y>=GameContants.sizeOfBoardY)
+						continue;
+					if(i==x && j==y)
+						continue;
+					Point p;
+					p.x=i;
+					p.y=j;
+					list.Add(p);
+				}
+			}
+		}else{
+			x=players[ind].x;
+			y=players[ind].y;
+			int bot=0, top=3;
+			if(!isServer){
+				top=GameContants.sizeOfBoardY;
+				bot=top-3;
+			}
+			for(int i=bot;i<top;i++){
+				for(int j=0;j<GameContants.sizeOfBoardX;j++){
+					if(i==y && j==x)
+						continue;
+					Point p;
+					p.x=j;
+					p.y=i;
+					list.Add(p);
+				}
 			}
 		}
 		selectScript.addSelectedTiles(list,BoardConstants.Move);
@@ -224,6 +263,7 @@ public class GameMoveListener : MonoBehaviour {
 		return -1;
 	}
 	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj){
+		this.isServer=isServer;
 		if(!isServer){
 			//TODO change the location of the camera
 			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
@@ -232,5 +272,40 @@ public class GameMoveListener : MonoBehaviour {
 		myPlayerScript=obj;
 		players=myPlayerScript.getPlayerDetails();
 		moves=myPlayerScript.movesList;
+		backUpMoves=new PlayerDetails[players.Length];
+		prepareForFirstMove();
+	}
+	public void generateMoves(){
+		//DONE Write a script to generate Moves
+		for(int i=0;i<players.Length;i++){
+			if(!compareTwoPlayerDetails(players[i],backUpMoves[i])){
+				Moves m;
+				m.ind=(short)i;
+				m.x=(short)players[i].x;
+				m.y=(short)players[i].y;
+				m.attackDef="";
+				moves.Add(m);
+			}
+		}
+	}
+	public void waitForOtherPlayers(){
+		isClicksActive=false;
+	}
+	public bool getisClickActive(){
+		return isClicksActive;
+	}
+	public void prepareForFirstMove(){
+		isClicksActive=true;
+		applyeRestrictions=false;
+		for(int i=0;i<backUpMoves.Length;i++){
+			backUpMoves[i]=players[i];
+		}
+	}
+	public void prepareForNextMove(){
+		isClicksActive=true;
+		applyeRestrictions=true;
+		for(int i=0;i<backUpMoves.Length;i++){
+			backUpMoves[i]=players[i];
+		}
 	}
 }

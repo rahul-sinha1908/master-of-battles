@@ -6,6 +6,7 @@ using MasterOfBattles;
 
 public class MyPlayerScript : NetworkBehaviour {
 	private GameObject otherPlayer;
+	private MyPlayerScript otherPlayerScript;
 	public GameObject prefab;
 	public GameObject timerPrefab;
 	private GameObject timeObject;
@@ -18,7 +19,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private GameObject[] playerObjects;
 	private List<Moves> attackMoves;
 	public List<Moves> movesList;
-	public float moveSpeed=15f; 
+	public float moveSpeed=15f;
 	ChessBoardFormation chess;
 
 	private void Start () {		
@@ -98,6 +99,8 @@ public class MyPlayerScript : NetworkBehaviour {
 		if(!isLocalPlayer)
 			return;
 		Moves[] moves;
+		gameMoveListener.generateMoves();
+		gameMoveListener.waitForOtherPlayers();
 		if(movesList.Count>0){
 			moves=movesList.ToArray();
 			movesList.Clear();
@@ -188,6 +191,8 @@ public class MyPlayerScript : NetworkBehaviour {
 				otherPlayer=GameObject.Find("ServerPlayer");
 			else if(!isServer && !isLocalPlayer)
 				otherPlayer=GameObject.Find("ClientPlayer");
+			if(otherPlayer!=null)
+				otherPlayerScript=otherPlayer.GetComponent<MyPlayerScript>();
 		}
 	}
 	private bool comparePositions(GameObject g, PlayerDetails p){
@@ -222,17 +227,28 @@ public class MyPlayerScript : NetworkBehaviour {
 		initOtherPlayer();
 
 		if(players!=null){
+			bool startClickListener=true;
 			for(int i=0;i<players.Length;i++){
 				if(playerObjects[i]!=null){
 					if(!comparePositions(playerObjects[i],players[i])){
+						startClickListener=false;
 						moveMyPlayer(playerObjects[i], players[i]);
 					}
 				}
 			}
+			
 			if(attackMoves.Count>0){
 				//TODO Do the attack Sequence
 			}
+			if(!isLocalPlayer){
+				if(startClickListener && otherPlayerScript!=null)
+					otherPlayerScript.prepareForNext();
+			}
 		}
 		//TODO Display All my Characters 
+	}
+	public void prepareForNext(){
+		if(!gameMoveListener.getisClickActive())
+			gameMoveListener.prepareForNextMove();
 	}
 }
