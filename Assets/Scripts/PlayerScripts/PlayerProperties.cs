@@ -8,12 +8,9 @@ using UnityEngine;
 
 public class PlayerProperties {
 	private string fileName;
-	public struct powerStruct{
-		public int id,intensity;
-	};
-	public int healthMetre, curHealth, playerIndex, playerType;
+	public int healthMetre, speed, curHealth, playerIndex, playerType;
 	public Point loc;
-	public List<powerStruct> powers;
+	public List<PowerStruct> powers;
 
 	public PlayerProperties(int i){
 		playerIndex=i;
@@ -35,8 +32,15 @@ public class PlayerProperties {
 		PlayerPrefs.SetInt(fileName+"Health",healthMetre);
 	}
 	private void LoadInit(){
-		healthMetre=50;
-		powers=new List<powerStruct>();
+		if(playerIndex<GameContants.NumberOfPlayer/2){
+			healthMetre=200;
+			speed=1;
+		}else{
+			healthMetre=100;
+			speed=2;
+		}
+		powers=new List<PowerStruct>();
+		addPowers(1,20,20);
 		playerType=1;
 		loc.x=playerIndex;
 		loc.y=0;
@@ -45,19 +49,20 @@ public class PlayerProperties {
 		if(File.Exists(Application.persistentDataPath + fileName)) {
 			BinaryFormatter bf = new BinaryFormatter();
 			FileStream file = File.Open(Application.persistentDataPath + fileName, FileMode.Open);
-			powers = (List<powerStruct>)bf.Deserialize(file);
+			powers = (List<PowerStruct>)bf.Deserialize(file);
 			file.Close();
 		}else{
-			powers=new List<powerStruct>();
+			powers=new List<PowerStruct>();
 		}
 		healthMetre= PlayerPrefs.GetInt(fileName+"Health",GameContants.DefaultHealth);
 	}
-	public void addPOwers(int id, int intensity){
-		powerStruct power;
+	public void addPowers(int id, int strength, int range){
+		PowerStruct power;
 		power.id=id;
-		power.intensity=intensity;
+		power.strength=strength;
+		power.range=range;
 		if(powers==null)
-			powers=new List<powerStruct>();
+			powers=new List<PowerStruct>();
 
 		powers.Add(power);
 	}

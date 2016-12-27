@@ -9,6 +9,7 @@ public class GameMoveListener : MonoBehaviour {
 
 	private int offsetHitX=GameContants.sizeOfBoardX/2;
 	private int offsetHitY=GameContants.sizeOfBoardY/2;
+	private PowersContants powerDatabase;
 	[SerializeField]
 	private LayerMask mask;
 	private bool isServer;
@@ -34,6 +35,7 @@ public class GameMoveListener : MonoBehaviour {
 		defaultCamVector=cam.transform.position;
 		defaultFeildOfView=cam.fieldOfView;
 
+		powerDatabase=PowersContants.getInstance();
 		trackClicks=false;
 		isClicksActive=true;
 	}
@@ -224,7 +226,7 @@ public class GameMoveListener : MonoBehaviour {
 		if(applyeRestrictions){
 			for(int i=x-1;i<=x+1;i++){
 				for(int j=y-1;j<=y+1;j++){
-					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || y>=GameContants.sizeOfBoardY)
+					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || j>=GameContants.sizeOfBoardY)
 						continue;
 					if(i==x && j==y)
 						continue;

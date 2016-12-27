@@ -7,6 +7,7 @@ using MasterOfBattles;
 public class MyPlayerScript : NetworkBehaviour {
 	private GameObject otherPlayer;
 	private MyPlayerScript otherPlayerScript;
+	private PowersContants powerDatabase;
 	public GameObject prefab;
 	public GameObject timerPrefab;
 	private GameObject timeObject;
@@ -24,6 +25,7 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	private void Start () {		
 		Debug.Log("My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
+		powerDatabase=PowersContants.getInstance();
 		if(isServer && isLocalPlayer){
 			transform.name="ServerPlayer";
 		}else if(isServer && !isLocalPlayer){
@@ -110,6 +112,12 @@ public class MyPlayerScript : NetworkBehaviour {
 			// moves[0].x=5;
 			// moves[0].y=5;
 			return;
+		}
+		for(int i=0;i<moves.Length;i++){
+			Debug.Log("ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
+			if(moves[i].attackDef!=""){
+				attackMoves.Add(moves[i]);
+			}
 		}
 		if(isServer){
 			RpcMovePos(moves);
@@ -227,25 +235,35 @@ public class MyPlayerScript : NetworkBehaviour {
 		initOtherPlayer();
 
 		if(players!=null){
-			bool startClickListener=true;
+			bool startAttackSequence=true;
 			for(int i=0;i<players.Length;i++){
 				if(playerObjects[i]!=null){
 					if(!comparePositions(playerObjects[i],players[i])){
-						startClickListener=false;
+						startAttackSequence=false;
 						moveMyPlayer(playerObjects[i], players[i]);
 					}
 				}
 			}
-			
-			if(attackMoves.Count>0){
-				//TODO Do the attack Sequence
-			}
-			if(!isLocalPlayer){
-				if(startClickListener && otherPlayerScript!=null)
-					otherPlayerScript.prepareForNext();
+			if(!isLocalPlayer && startAttackSequence){
+				StartCoroutine(doAttackSequence());
+				if(otherPlayerScript!=null)
+					otherPlayerScript.prepareForAttack();
 			}
 		}
-		//TODO Display All my Characters 
+		//DONE Display All my Characters 
+	}
+	private IEnumerator doAttackSequence(){
+		if(attackMoves.Count>0){
+			//TODO Do the attack Sequence
+		}
+		yield return new WaitForSeconds(2);
+		if(isLocalPlayer){
+			prepareForNext();
+		}
+	}
+	public void prepareForAttack(){
+		//DONE call prepare for next
+		StartCoroutine(doAttackSequence());
 	}
 	public void prepareForNext(){
 		if(!gameMoveListener.getisClickActive())
