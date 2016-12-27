@@ -39,9 +39,17 @@ public class MyPlayerScript : NetworkBehaviour {
 		attackMoves=new List<Moves>();
 		movesList=new List<Moves>();
 		if(isServer){
-			timeObject = GameObject.Instantiate(timerPrefab);
-			timeTracker=timeObject.GetComponent<TimeTracker>();
-			NetworkServer.Spawn(timeObject);
+			Debug.Log("It is Server too ? ");
+			if(isLocalPlayer){
+				timeObject = GameObject.Instantiate(timerPrefab);
+				timeTracker=timeObject.GetComponent<TimeTracker>();
+				timeObject.name="TimeTracker";
+				NetworkServer.Spawn(timeObject);
+			}else{
+				timeObject=GameObject.Find("TimeTracker");
+				if(timeObject!=null)
+					timeTracker=timeObject.GetComponent<TimeTracker>();
+			}
 			//TODO Fix th authority problem.
 		}
 		initLocalVar();
@@ -111,6 +119,12 @@ public class MyPlayerScript : NetworkBehaviour {
 			// moves[0].ind=5;
 			// moves[0].x=5;
 			// moves[0].y=5;
+			if(isServer){
+				RpcMovePos(null);
+				//reinitCount();
+			}else if(!isServer){
+				CmdMovePos(null);
+			}
 			return;
 		}
 		for(int i=0;i<moves.Length;i++){
@@ -138,7 +152,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 	[Command]
 	private void CmdMovePos(Moves[] moves){
-		Debug.Log("Cmd Move Pos : "+moves.Length+" : "+moves[0].ind+" : "+moves[0].x+" : "+moves[0].y);
+		Debug.Log("Cmd Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 		//CmdreinitCount();
 	}
@@ -158,7 +172,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void RpcMovePos(Moves[] moves){
 		if(isServer)
 			return;
-		Debug.Log("Rpc Move Pos : "+moves.Length+" : "+moves[0].ind+" : "+moves[0].x+" : "+moves[0].y);
+		Debug.Log("Rpc Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 		//CmdreinitCount();
 	}
@@ -176,6 +190,7 @@ public class MyPlayerScript : NetworkBehaviour {
 //Remote Calls Till Here
 	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
+		attackMoves.Clear();
 		for(int i=0;i<moves.Length;i++){
 			Debug.Log("ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
 			if(moves[i].attackDef==""){
@@ -187,6 +202,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				attackMoves.Add(moves[i]);
 			}
 		}
+		reachedOnce=false;
 	}
 
 	private void initOtherPlayer(){
@@ -231,6 +247,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		// 	g.transform.position=pos;
 		//playerObjects[i].transform.GetComponent<Rigidbody>().MovePosition((pos - playerObjects[i].transform.position)*moveSpeed*Time.deltaTime);
 	}
+	private bool reachedOnce=true;
 	private void Update () {
 		initOtherPlayer();
 
@@ -240,14 +257,19 @@ public class MyPlayerScript : NetworkBehaviour {
 				if(playerObjects[i]!=null){
 					if(!comparePositions(playerObjects[i],players[i])){
 						startAttackSequence=false;
+						reachedOnce=false;
 						moveMyPlayer(playerObjects[i], players[i]);
 					}
 				}
 			}
-			if(!isLocalPlayer && startAttackSequence){
+			if(!isLocalPlayer && startAttackSequence && !reachedOnce){
+				Debug.Log("It Entered Here 223");
 				StartCoroutine(doAttackSequence());
 				if(otherPlayerScript!=null)
 					otherPlayerScript.prepareForAttack();
+				else
+					Debug.Log("Other Player Script Not Found");
+				reachedOnce=true;
 			}
 		}
 		//DONE Display All my Characters 
@@ -255,11 +277,16 @@ public class MyPlayerScript : NetworkBehaviour {
 	private IEnumerator doAttackSequence(){
 		if(attackMoves.Count>0){
 			//TODO Do the attack Sequence
+			for(int i=0;i<attackMoves.Count;i++){
+				Debug.Log("initiate Attack : "+attackMoves[i].x+" : "+attackMoves[i].y);
+			}
 		}
+		attackMoves.Clear();
 		yield return new WaitForSeconds(2);
 		if(isLocalPlayer){
 			prepareForNext();
 		}
+		yield break;
 	}
 	public void prepareForAttack(){
 		//DONE call prepare for next

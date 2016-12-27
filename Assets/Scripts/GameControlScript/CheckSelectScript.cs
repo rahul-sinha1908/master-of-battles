@@ -50,6 +50,11 @@ public class CheckSelectScript : MonoBehaviour {
 			uv.Add(new Vector2(1f,0.5f));
 			uv.Add(new Vector2(0.5f,1f));
 			uv.Add(new Vector2(1f,1f));
+		}else if(colorInd==BoardConstants.Attack){
+			uv.Add(new Vector2(0.5f,0.5f));
+			uv.Add(new Vector2(1f,0.5f));
+			uv.Add(new Vector2(0.5f,1f));
+			uv.Add(new Vector2(1f,1f));
 		}
 
 		int vi=vertices.Count-4;
@@ -60,7 +65,7 @@ public class CheckSelectScript : MonoBehaviour {
 		triangles[ti + 3] = triangles[ti + 2] = vi + 1;
 		triangles[ti + 4] = triangles[ti + 1] = vi + 2;
 		triangles[ti + 5] = vi + 3;
-		Debug.Log(vertices.ToArray().Length+" : "+uv.ToArray().Length+" : "+triangles.ToArray().Length);
+		//Debug.Log(vertices.ToArray().Length+" : "+uv.ToArray().Length+" : "+triangles.ToArray().Length);
 		// for(int i=0;i<vertices.Count;i++)
 		// 	Debug.Log(vertices[i]);
 		// for(int i=0;i<triangles.Count;i++)
@@ -99,7 +104,7 @@ public class CheckSelectScript : MonoBehaviour {
 
 		for(int i=0;i<points.Count;i++){
 			int k=checkExisting(points[i], colorInd);
-			Debug.Log("K = "+k);
+			//Debug.Log("K = "+k);
 			if(k==-1)
 				generateVerticesAndTriangle(points[i].x,points[i].y, colorInd);
 			else{

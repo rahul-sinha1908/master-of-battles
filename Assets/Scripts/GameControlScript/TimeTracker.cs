@@ -15,7 +15,7 @@ public class TimeTracker : NetworkBehaviour {
 	public bool playerCountDownClient=false;
 
 	private GameObject serverPlayer, clientPlayer;
-	private MyPlayerScript serverPLayerScript, clientPlayerScript;
+	private MyPlayerScript serverPlayerScript, clientPlayerScript;
 	private bool dataSend=true;
 	// Use this for initialization
 	void Start () {
@@ -26,7 +26,7 @@ public class TimeTracker : NetworkBehaviour {
 		if(serverPlayer==null){
 			serverPlayer=GameObject.Find("ServerPlayer");
 			if(serverPlayer!=null)
-				serverPLayerScript=serverPlayer.GetComponent<MyPlayerScript>();
+				serverPlayerScript=serverPlayer.GetComponent<MyPlayerScript>();
 		}if(clientPlayer==null){
 			clientPlayer=GameObject.Find("ClientPlayer");
 			if(clientPlayer!=null)
@@ -41,13 +41,10 @@ public class TimeTracker : NetworkBehaviour {
 
 	
 	private void sendMoves(){
-		serverPLayerScript.sendMoves();
+		serverPlayerScript.sendMoves();
 		clientPlayerScript.sendMoves();
 	}
 	private void calculateTimeActions(){
-		if(playerCountDownClient && playerCountDownServer){
-				sendMoves();
-		}
 		if(isServer){
 			if(timeleft==0){
 				timeleft=-1;
@@ -79,6 +76,8 @@ public class TimeTracker : NetworkBehaviour {
 		initiateMyGamePlayers();
 
 		calculateTimeActions();
+		if(playerCountDownClient && playerCountDownServer)
+			timeleft=0;
 		if(timeleft!=-1){
 			if(timeleft==0 && !dataSend){
 				sendMoves();
@@ -108,12 +107,10 @@ public class TimeTracker : NetworkBehaviour {
 	private void OnGUI()
 	{
 		string s="Time Left : "+timeleft+" sec";
-		int a=60;
 		if(timeleft==-1){
-			a=0;
 			s="Send Moves";
 		}
-		if(GUI.Button(new Rect(100,100+a,100,50),s)){
+		if(GUI.Button(new Rect(100,100,100,50),s)){
 			if(!isServer)
 				clientPlayerScript.changeClientCountDown(true);
 			else

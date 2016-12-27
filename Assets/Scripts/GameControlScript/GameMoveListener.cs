@@ -16,6 +16,7 @@ public class GameMoveListener : MonoBehaviour {
 	private int boxX,boxY;
 	private MyPlayerScript myPlayerScript;
 	private PlayerDetails[] players, backUpMoves;
+	private Moves[] attackMoveT;
 	private List<Moves> moves;
 	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f, camPanSpeed=1f, defaultFeildOfView;
 	private Vector3 defaultCamVector;	
@@ -29,6 +30,8 @@ public class GameMoveListener : MonoBehaviour {
 	private bool selectPlayer=true;
 	private int selectedPlayerInd=-1;
 	private float doubleClickTimeLimit=0.3f;
+	private List<Point> listPossibleMoves;
+	private bool isAttack;
 	// Use this for initialization
 	void Start () {
 		cam = Camera.main;
@@ -181,12 +184,10 @@ public class GameMoveListener : MonoBehaviour {
 							p.x=backUpMoves[k].x;
 							p.y=backUpMoves[k].y;
 						}
-						selectScript.showSelectedTiles(p,BoardConstants.Select);
-						selectPlayer=false;
-						searchPossibleMoves(selectedPlayerInd,true);
+						selectAndSearch(p,move);
 					}
 				}else{
-					if(move){
+					if(!isAttack){
 						int s=selectedPlayerInd;
 						//TODO Instead of using 1 constant use the player properties to get the max moves.
 						if(applyeRestrictions && (Math.Abs(p.x-backUpMoves[s].x)>1 || Math.Abs(p.y-backUpMoves[s].y)>1))
@@ -203,6 +204,17 @@ public class GameMoveListener : MonoBehaviour {
 						}
 						players[selectedPlayerInd].x=(short)p.x;
 						players[selectedPlayerInd].y=(short)p.y;
+						attackMoveT[selectedPlayerInd].x=-1;
+						attackMoveT[selectedPlayerInd].y=-1;
+					}else{
+						p.x=boxX;
+						p.y=boxY;
+						if(isPossibleMove(p)){
+							Debug.Log("Possible Attack");
+							attackMoveT[selectedPlayerInd].x=(short)p.x;
+							attackMoveT[selectedPlayerInd].y=(short)p.y;
+							searchPossibleAttacks(selectedPlayerInd);
+						}
 					}
 					//selectPlayer=true;
 				}
@@ -214,13 +226,108 @@ public class GameMoveListener : MonoBehaviour {
 				p.x=backUpMoves[ind].x;
 				p.y=backUpMoves[ind].y;
 				selectedPlayerInd=ind;
-				selectScript.showSelectedTiles(p,BoardConstants.Select);
-				selectPlayer=false;
-				searchPossibleMoves(selectedPlayerInd,true);
+				selectAndSearch(p,move);
 			}
 		}
 	}
+	private void selectAndSearch(Point p, bool move){
+		if(!move && !compareTwoPlayerDetails(players[selectedPlayerInd], backUpMoves[selectedPlayerInd])){
+			//TODO Display a feedback that you cant attack from that position
+			return;
+		}
+
+		selectScript.showSelectedTiles(p,BoardConstants.Select);
+		selectPlayer=false;
+		searchPossibleMoves(selectedPlayerInd,move);
+	}
+	private bool isPossibleMove(Point p){
+		for(int i=0;i<listPossibleMoves.Count;i++){
+			if(p.Equals(listPossibleMoves[i])){
+				return true;
+			}
+		}
+		return false;
+	}
+	private bool validatePoint(Point p){
+		if(p.x>=0 && p.x<GameContants.sizeOfBoardX && p.y>=0 && p.y<GameContants.sizeOfBoardY)
+			return true;
+		return false;
+	} 
+	private void searchPossibleAttacks(int ind){
+		List<Point> list=new List<Point>();
+		Debug.Log("Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
+		for(int i=0;i<GameContants.sizeOfBoardX;i++){
+			Point p=new Point();
+			p.x=i;
+			p.y=players[ind].y;
+			if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+				selectScript.showSelectedTiles(p,BoardConstants.Select);
+			else
+				list.Add(p);
+			p=new Point();
+			p.y=i;
+			p.x=players[ind].x;
+			if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+				selectScript.showSelectedTiles(p,BoardConstants.Select);
+			else
+				list.Add(p);
+		}
+		//TODO Do Somethins for diagonal Points
+		int x=players[ind].x,y=players[ind].y;
+		for(int i=0;;i++){
+			bool b=false;
+			Point p=new Point();
+			p.x=x+i;
+			p.y=y+i;
+			if(validatePoint(p)){
+				b=true;
+				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+					selectScript.showSelectedTiles(p,BoardConstants.Select);
+				else
+					list.Add(p);
+			}
+			p=new Point();
+			p.x=x-i;
+			p.y=y-i;
+			if(validatePoint(p)){
+				b=true;
+				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+					selectScript.showSelectedTiles(p,BoardConstants.Select);
+				else
+					list.Add(p);
+			}
+			p=new Point();
+			p.x=x-i;
+			p.y=y+i;
+			if(validatePoint(p)){
+				b=true;
+				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+					selectScript.showSelectedTiles(p,BoardConstants.Select);
+				else
+					list.Add(p);
+			}
+			p=new Point();
+			p.x=x+i;
+			p.y=y-i;
+			if(validatePoint(p)){
+				b=true;
+				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+					selectScript.showSelectedTiles(p,BoardConstants.Select);
+				else
+					list.Add(p);
+			}
+			if(b==false)
+				break;
+		}
+		listPossibleMoves=list;
+		selectScript.addSelectedTiles(list,BoardConstants.Attack);
+	}
 	private void searchPossibleMoves(int ind, bool move){
+		isAttack=!move;
+		if(!move){
+			searchPossibleAttacks(ind);
+			return;
+		}
 		List<Point> list=new List<Point>();
 		int x=backUpMoves[ind].x, y=backUpMoves[ind].y;
 		if(applyeRestrictions){
@@ -275,6 +382,13 @@ public class GameMoveListener : MonoBehaviour {
 		players=myPlayerScript.getPlayerDetails();
 		moves=myPlayerScript.movesList;
 		backUpMoves=new PlayerDetails[players.Length];
+		attackMoveT=new Moves[players.Length];
+		for(int i=0;i<players.Length;i++){
+			attackMoveT[i].ind=(short)i;
+			attackMoveT[i].attackDef="";
+			attackMoveT[i].x=-1;
+			attackMoveT[i].y=-1;
+		}
 		prepareForFirstMove();
 	}
 	public void generateMoves(){
@@ -287,6 +401,14 @@ public class GameMoveListener : MonoBehaviour {
 				m.y=(short)players[i].y;
 				m.attackDef="";
 				moves.Add(m);
+			}
+		}
+		for(int i=0;i<attackMoveT.Length;i++){
+			if(attackMoveT[i].x!=-1 && attackMoveT[i].y!=-1){
+				attackMoveT[i].attackDef="1|20|20";
+				moves.Add(attackMoveT[i]);
+				attackMoveT[i].x=-1;
+				attackMoveT[i].y=-1;
 			}
 		}
 	}
