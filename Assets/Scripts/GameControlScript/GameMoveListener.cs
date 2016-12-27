@@ -19,6 +19,8 @@ public class GameMoveListener : MonoBehaviour {
 	private Vector3 defaultCamVector;	
 	private Camera cam;
 	private bool trackClicks=true;
+	private Vector2 trackClickVect;
+	private float trackClickCount=0f;
 	[SerializeField]
 	private CheckSelectScript selectScript;
 	private bool selectPlayer=true;
@@ -30,7 +32,7 @@ public class GameMoveListener : MonoBehaviour {
 		defaultCamVector=cam.transform.position;
 		defaultFeildOfView=cam.fieldOfView;
 
-		StartCoroutine(InputListener());
+		trackClicks=false;
 	}
 	
 	private void detectZoom(){
@@ -70,56 +72,6 @@ public class GameMoveListener : MonoBehaviour {
 
 	}
 
-	private IEnumerator InputListener() 
-	{
-		trackClicks=true;
-		while(trackClicks)
-		{ //Run as long as this is active
-			//Debug.LogError("It Entered Here : "+trackClicks);
-			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began)
-				yield return ClickEvent(Input.GetTouch(0).position);
-				//yield return ClickEvent();
-			else if(CrossPlatformInputManager.GetButtonDown("Fire1"))
-				yield return ClickEvent(Input.mousePosition);
-				//yield return ClickEvent();
-
-			yield return null;
-		}
-	}
-
-	private IEnumerator ClickEvent(Vector2 vect)
-	{	//Debug.Log("It Came here");
-		//pause a frame so you don't pick up the same mouse down event.
-		//Debug.LogError("It Entered Here : "+vect);
-		yield return new WaitForEndOfFrame();
-		float count = 0f;
-		while(count < doubleClickTimeLimit)
-		{
-			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
-				if(Vector2.Distance(vect, Input.GetTouch(0).position)<5)
-					DoubleClick(vect);
-				yield break;
-			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
-				yield break;
-			}
-			else if(CrossPlatformInputManager.GetButtonDown("Fire1"))
-			{
-				//Debug.LogError("It Entered Here3 : "+CrossPlatformInputManager.GetButtonDown("Fire1"));
-				if(Vector2.Distance(vect, Input.mousePosition)<5)
-					DoubleClick(vect);
-				yield break;
-			}else if(CrossPlatformInputManager.GetButton("Fire1")){
-				if(Vector2.Distance(vect, Input.mousePosition)>5){
-					yield break;
-				}
-			}
-			count += Time.deltaTime;// increment counter by change in time between frames
-			yield return null; // wait for the next frame
-		}
-		//Debug.LogError("It Entered Here2 : ");
-		SingleClick(vect);
-	}
-
 	private void SingleClick(Vector2 vect)
 	{	
 		//Debug.LogError("2 : "+vect);
@@ -137,14 +89,56 @@ public class GameMoveListener : MonoBehaviour {
 		Debug.Log("Double Click");
 	}
 
+	private void checkClickListener(){
+		if(trackClicks==false){
+			//TODO DO the function for assigning the initial values
+			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
+				trackClickVect=Input.GetTouch(0).position;
+				trackClicks=true;
+				trackClickCount=0f;
+			}
+			else if(CrossPlatformInputManager.GetButtonDown("Fire1")){
+				trackClickVect=Input.mousePosition;
+				trackClicks=true;
+				trackClickCount=0f;
+			}
+		}
+		else if(trackClickCount>doubleClickTimeLimit){
+			SingleClick(trackClickVect);
+			trackClicks=false;
+			trackClickCount=0f;
+		}
+		else{
+			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
+				if(Vector2.Distance(trackClickVect, Input.GetTouch(0).position)<5)
+					DoubleClick(trackClickVect);
+				trackClicks=false;
+			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
+				trackClicks=false;
+			}
+			else if(CrossPlatformInputManager.GetButtonDown("Fire1"))
+			{
+				//Debug.LogError("It Entered Here3 : "+CrossPlatformInputManager.GetButtonDown("Fire1"));
+				if(Vector2.Distance(trackClickVect, Input.mousePosition)<5)
+					DoubleClick(trackClickVect);
+				trackClicks=false;
+			}else if(CrossPlatformInputManager.GetButton("Fire1")){
+				if(Vector2.Distance(trackClickVect, Input.mousePosition)>5){
+					trackClicks=false;
+				}
+			}
+			trackClickCount += Time.deltaTime;
+		}
+	}
 	// Update is called once per frame
 	void Update () {
+		checkClickListener();
 		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
-			if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x+touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
+			if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x-touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
 				touchDeltaPosition.x=0;
 			//TODO Take care of this constant value if ever camera position is changed
-			if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.boxSize && Mathf.Abs(cam.transform.position.z+touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
+			if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.boxSize && Mathf.Abs(cam.transform.position.z-touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
 				touchDeltaPosition.y=0;
 			cam.transform.Translate(-touchDeltaPosition.x * camPanSpeed, 0, -touchDeltaPosition.y * camPanSpeed, Space.World);
         }else if (Input.touchCount == 2){
