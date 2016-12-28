@@ -18,6 +18,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private Vector3 playerHeight=new Vector3(0,1,0);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
+	private Animator[] playerAnim;
 	private List<Moves> attackMoves;
 	public List<Moves> movesList;
 	public float moveSpeed=15f;
@@ -83,6 +84,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void createPlayer(bool myTeam){
 		Debug.Log("Toatal Players :"+players.Length);
 		playerObjects=new GameObject[players.Length];
+		playerAnim=new Animator[players.Length];
 		for(int i=0;i<players.Length;i++){
 			//TODO Make the prefab dynamic instead of static
 			Vector3 creationPoint=new Vector3(players[i].x,0,players[i].y)+offset+playerHeight;
@@ -98,6 +100,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				go.name="OpponentTeam"+players[i].ind;
 			}
 			playerObjects[i]=go;
+			playerAnim[i]=go.GetComponent<Animator>();
 			//go.layer=LayerMask.GetMask("Hello");
 		}
 	}
@@ -227,7 +230,7 @@ public class MyPlayerScript : NetworkBehaviour {
 			return true;
 		return false;
 	}
-	private void moveMyPlayer(GameObject g, PlayerDetails p){
+	private void moveMyPlayer(GameObject g, PlayerDetails p, Animator anim){
 		//TODO Do animation and stuffs
 		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
 		pos.x*=GameContants.boxSize;
@@ -237,9 +240,13 @@ public class MyPlayerScript : NetworkBehaviour {
 		dir.Normalize();
 		CharacterController cc=g.GetComponent<CharacterController>();
 		if(Vector3.Distance(ipos,pos)<1.5){
-			g.transform.position=pos;
-		}else
-			cc.Move(dir);
+			g.transform.position=new Vector3(pos.x,g.transform.position.y,pos.z);
+			anim.SetBool("Walk", false);
+		}else{
+			cc.Move(dir*10*Time.deltaTime);
+			g.transform.LookAt(pos);
+			anim.SetBool("Walk", true);
+		}
 		
 		// if(dir.sqrMagnitude>moveSpeed*moveSpeed*Time.deltaTime*Time.deltaTime)
 		// 	g.transform.position=ipos+dir*moveSpeed*Time.deltaTime;
@@ -258,7 +265,7 @@ public class MyPlayerScript : NetworkBehaviour {
 					if(!comparePositions(playerObjects[i],players[i])){
 						startAttackSequence=false;
 						reachedOnce=false;
-						moveMyPlayer(playerObjects[i], players[i]);
+						moveMyPlayer(playerObjects[i], players[i], playerAnim[i]);
 					}
 				}
 			}

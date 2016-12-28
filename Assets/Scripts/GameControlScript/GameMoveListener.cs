@@ -18,7 +18,7 @@ public class GameMoveListener : MonoBehaviour {
 	private PlayerDetails[] players, backUpMoves;
 	private Moves[] attackMoveT;
 	private List<Moves> moves;
-	private float orthoZoomSpeed=0.5f, perspectiveZoomSpeed=0.5f, camPanSpeed=1f, defaultFeildOfView;
+	private float orthoZoomSpeed=0.2f, perspectiveZoomSpeed=0.2f, camPanSpeed=1f, defaultFeildOfView;
 	private Vector3 defaultCamVector;	
 	private Camera cam;
 	private bool isClicksActive, applyeRestrictions;
@@ -54,8 +54,8 @@ public class GameMoveListener : MonoBehaviour {
 		Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
 		// Find the magnitude of the vector (the distance) between the touches in each frame.
-		float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-		float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+		float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).sqrMagnitude;
+		float touchDeltaMag = (touchZero.position - touchOne.position).sqrMagnitude;
 
 		// Find the difference in the distances between each frame.
 		float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
@@ -164,6 +164,10 @@ public class GameMoveListener : MonoBehaviour {
 	}
 	private void performActionOnHit(Ray ray, bool move){
 		RaycastHit hit;
+		if(!applyeRestrictions && !move){
+			return;
+			//TODO Give an instruction that you cant fire in the first turn
+		}
 		//TODO Put a layer mask on this.
 		if(Physics.Raycast(ray,out hit,10000,mask)){
 			//DONE Divide this by a constant if you want to increase the area of the play
@@ -235,7 +239,7 @@ public class GameMoveListener : MonoBehaviour {
 			//TODO Display a feedback that you cant attack from that position
 			return;
 		}
-
+		
 		selectScript.showSelectedTiles(p,BoardConstants.Select);
 		selectPlayer=false;
 		searchPossibleMoves(selectedPlayerInd,move);
