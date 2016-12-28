@@ -8,14 +8,15 @@ public class MyPlayerScript : NetworkBehaviour {
 	private GameObject otherPlayer;
 	private MyPlayerScript otherPlayerScript;
 	private PowersContants powerDatabase;
-	public GameObject prefab;
+	public GameObject prefab, bulletPrefab;
 	public GameObject timerPrefab;
 	private GameObject timeObject;
 	private TimeTracker timeTracker;
 	public Camera cam;
 	private GameMoveListener gameMoveListener;
 	private Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
-	private Vector3 playerHeight=new Vector3(0,1,0);
+	private Vector3 playerHeight=new Vector3(0,0,0);
+	private Vector3 opponentPost=new Vector3(0,0,GameContants.sizeOfBoardY*GameContants.boxSize);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
 	private Animator[] playerAnim;
@@ -27,6 +28,10 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void Start () {		
 		Debug.Log("My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
 		powerDatabase=PowersContants.getInstance();
+		
+		if(!isServer)
+			opponentPost=opponentPost*-1;
+		opponentPost=opponentPost+playerHeight;	
 		if(isServer && isLocalPlayer){
 			transform.name="ServerPlayer";
 		}else if(isServer && !isLocalPlayer){
@@ -230,6 +235,11 @@ public class MyPlayerScript : NetworkBehaviour {
 			return true;
 		return false;
 	}
+	private float sqrDist(Vector3 v1, Vector3 v2){
+		float a=0;
+		a=(v1.x-v2.x)*(v1.x-v2.x)+(v1.y-v2.y)*(v1.y-v2.y)+(v1.z-v2.z)*(v1.z-v2.z);
+		return a;
+	}
 	private void moveMyPlayer(GameObject g, PlayerDetails p, Animator anim){
 		//TODO Do animation and stuffs
 		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
@@ -239,9 +249,11 @@ public class MyPlayerScript : NetworkBehaviour {
 		Vector3 dir =  (pos-ipos);
 		dir.Normalize();
 		CharacterController cc=g.GetComponent<CharacterController>();
-		if(Vector3.Distance(ipos,pos)<1.5){
+		
+		if(sqrDist(ipos,pos)<1.5*1.5){
 			g.transform.position=new Vector3(pos.x,g.transform.position.y,pos.z);
 			anim.SetBool("Walk", false);
+			g.transform.LookAt(new Vector3(g.transform.position.x,transform.position.y,opponentPost.z));
 		}else{
 			cc.Move(dir*10*Time.deltaTime);
 			g.transform.LookAt(pos);
@@ -285,7 +297,16 @@ public class MyPlayerScript : NetworkBehaviour {
 		if(attackMoves.Count>0){
 			//TODO Do the attack Sequence
 			for(int i=0;i<attackMoves.Count;i++){
+				int x1,y1,x2,y2;
+				x1=players[attackMoves[i].ind].x;
+				y1=players[attackMoves[i].ind].y;
+				x2=attackMoves[i].x;
+				y2=attackMoves[i].y;
+
+				GameObject go= GameObject.Instantiate(bulletPrefab,new Vector3(x1,0,y1), Quaternion.LookRotation((new Vector3(x2,0,y2)-new Vector3(x1,0,y1))));
+				go.GetComponent<Rigidbody>().AddForce(go.transform.forward*200, ForceMode.Impulse);
 				Debug.Log("initiate Attack : "+attackMoves[i].x+" : "+attackMoves[i].y);
+				Destroy(go,2);
 			}
 		}
 		attackMoves.Clear();

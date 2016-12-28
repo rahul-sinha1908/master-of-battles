@@ -24,6 +24,7 @@ public class GameMoveListener : MonoBehaviour {
 	private bool isClicksActive, applyeRestrictions;
 	private bool trackClicks=true;
 	private Vector2 trackClickVect;
+	private Vector3 trackDragVect;
 	private float trackClickCount=0f;
 	[SerializeField]
 	private CheckSelectScript selectScript;
@@ -43,22 +44,29 @@ public class GameMoveListener : MonoBehaviour {
 		isClicksActive=true;
 	}
 	
-	private void detectZoom(){
+	private void detectZoom(float wheel){
 		Debug.Log("Touch Count : "+Input.touchCount);
-		// Store both touches.
-		Touch touchZero = Input.GetTouch(0);
-		Touch touchOne = Input.GetTouch(1);
 
-		// Find the position in the previous frame of each touch.
-		Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-		Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+		float deltaMagnitudeDiff=0f;
+		
+		if(wheel==0){
+			// Store both touches.
+			Touch touchZero = Input.GetTouch(0);
+			Touch touchOne = Input.GetTouch(1);
 
-		// Find the magnitude of the vector (the distance) between the touches in each frame.
-		float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).sqrMagnitude;
-		float touchDeltaMag = (touchZero.position - touchOne.position).sqrMagnitude;
+			// Find the position in the previous frame of each touch.
+			Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+			Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
-		// Find the difference in the distances between each frame.
-		float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+			// Find the magnitude of the vector (the distance) between the touches in each frame.
+			float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).sqrMagnitude;
+			float touchDeltaMag = (touchZero.position - touchOne.position).sqrMagnitude;
+
+			// Find the difference in the distances between each frame.
+			deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+		}else{
+			deltaMagnitudeDiff=-wheel* PlayerPrefs.GetInt(UserPrefs.scrollSpeed, 100);
+		}
 
 		// If the camera is orthographic...
 		if (cam.orthographic)
@@ -79,7 +87,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 
 	}
-
+	
 	private bool compareTwoPlayerDetails(PlayerDetails a, PlayerDetails b){
 		if(a.x==b.x && a.y==b.y)
 			return true;
@@ -99,6 +107,12 @@ public class GameMoveListener : MonoBehaviour {
 		ray=Camera.main.ScreenPointToRay(vect);
 		performActionOnHit(ray, false);
 	}
+	private float sqrDist(Vector3 v1, Vector3 v2){
+		float a=0;
+		a=(v1.x-v2.x)*(v1.x-v2.x)+(v1.y-v2.y)*(v1.y-v2.y)+(v1.z-v2.z)*(v1.z-v2.z);
+		return a;
+	}
+
 	private void checkClickListener(){
 		if(!isClicksActive)
 			return;
@@ -122,7 +136,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		else{
 			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
-				if(Vector2.Distance(trackClickVect, Input.GetTouch(0).position)<5)
+				if(sqrDist(trackClickVect, Input.GetTouch(0).position)<25)
 					DoubleClick(trackClickVect);
 				trackClicks=false;
 			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
@@ -142,20 +156,36 @@ public class GameMoveListener : MonoBehaviour {
 			trackClickCount += Time.deltaTime;
 		}
 	}
+	private void Pan(Vector2 touchDeltaPosition){
+		if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x-touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
+			touchDeltaPosition.x=0;
+		//TODO Take care of this constant value if ever camera position is changed
+		if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.boxSize && Mathf.Abs(cam.transform.position.z-touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
+			touchDeltaPosition.y=0;
+		cam.transform.Translate(-touchDeltaPosition.x * camPanSpeed, 0, -touchDeltaPosition.y * camPanSpeed, Space.World);
+	}
 	// Update is called once per frame
 	void Update () {
 		checkClickListener();
 		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
-			if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x-touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
-				touchDeltaPosition.x=0;
-			//TODO Take care of this constant value if ever camera position is changed
-			if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.boxSize && Mathf.Abs(cam.transform.position.z-touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
-				touchDeltaPosition.y=0;
-			cam.transform.Translate(-touchDeltaPosition.x * camPanSpeed, 0, -touchDeltaPosition.y * camPanSpeed, Space.World);
+			Pan(touchDeltaPosition);
         }else if (Input.touchCount == 2){
-			detectZoom();
-        }
+			detectZoom(0);
+        }else if(Input.GetAxis("Mouse ScrollWheel")!=0){
+			Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
+			detectZoom(Input.GetAxis("Mouse ScrollWheel"));
+		}else if(CrossPlatformInputManager.GetButtonDown("Fire1")){
+			trackDragVect=Input.mousePosition;
+		}else if(CrossPlatformInputManager.GetButton("Fire1")){
+			if(Input.mousePosition!=trackDragVect){
+				Vector2 delta=Input.mousePosition-trackDragVect;
+				trackDragVect=Input.mousePosition;
+				delta = delta * PlayerPrefs.GetFloat(UserPrefs.moveSensitivity, 0.2f);
+				Pan(delta);
+			}
+			
+		}
 	}
 	private void setDefaultCameraPostion(){
 		cam.transform.position=defaultCamVector;
@@ -242,7 +272,8 @@ public class GameMoveListener : MonoBehaviour {
 		
 		selectScript.showSelectedTiles(p,BoardConstants.Select);
 		selectPlayer=false;
-		searchPossibleMoves(selectedPlayerInd,move);
+		searchPossibleMoves(selectedPlayerInd,move, p);
+		//searchPossibleMoves(selectedPlayerInd,move);
 	}
 	private bool isPossibleMove(Point p){
 		for(int i=0;i<listPossibleMoves.Count;i++){
@@ -326,7 +357,8 @@ public class GameMoveListener : MonoBehaviour {
 		listPossibleMoves=list;
 		selectScript.addSelectedTiles(list,BoardConstants.Attack);
 	}
-	private void searchPossibleMoves(int ind, bool move){
+	private void searchPossibleMoves(int ind, bool move, Point pt){
+	//private void searchPossibleMoves(int ind, bool move){
 		isAttack=!move;
 		if(!move){
 			searchPossibleAttacks(ind);
@@ -339,7 +371,8 @@ public class GameMoveListener : MonoBehaviour {
 				for(int j=y-1;j<=y+1;j++){
 					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || j>=GameContants.sizeOfBoardY)
 						continue;
-					if(i==x && j==y)
+					if((i==x && j==y) || (i==pt.x&& j==pt.y))
+					//if(i==x && j==y)
 						continue;
 					Point p;
 					p.x=i;
@@ -357,7 +390,8 @@ public class GameMoveListener : MonoBehaviour {
 			}
 			for(int i=bot;i<top;i++){
 				for(int j=0;j<GameContants.sizeOfBoardX;j++){
-					if(i==y && j==x)
+					if((j==x && i==y) || (j==pt.x && i==pt.y))
+					//if(j==x && i==y)
 						continue;
 					Point p;
 					p.x=j;
