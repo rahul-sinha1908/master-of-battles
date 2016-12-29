@@ -32,6 +32,8 @@ public class GameMoveListener : MonoBehaviour {
 	private int selectedPlayerInd=-1;
 	private float doubleClickTimeLimit=0.3f;
 	private List<Point> listPossibleMoves;
+	private ChessBoardFormation chess;
+	private List<PlayerProperties> playerProp;
 	private bool isAttack;
 	// Use this for initialization
 	void Start () {
@@ -40,10 +42,18 @@ public class GameMoveListener : MonoBehaviour {
 		defaultFeildOfView=cam.fieldOfView;
 
 		powerDatabase=PowersContants.getInstance();
+		chess=ChessBoardFormation.getInstance();
+		playerProp=chess.gameFormation;
+		initialiseHealtMetre();
+
 		trackClicks=false;
 		isClicksActive=true;
 	}
-	
+	private void initialiseHealtMetre(){
+		for(int i=0;i<playerProp.Count;i++){
+			playerProp[i].curHealth=playerProp[i].healthMetre;
+		}
+	}
 	private void detectZoom(float wheel){
 		Debug.Log("Touch Count : "+Input.touchCount);
 
@@ -59,11 +69,12 @@ public class GameMoveListener : MonoBehaviour {
 			Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
 			// Find the magnitude of the vector (the distance) between the touches in each frame.
-			float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).sqrMagnitude;
-			float touchDeltaMag = (touchZero.position - touchOne.position).sqrMagnitude;
+			float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+			float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
 			// Find the difference in the distances between each frame.
 			deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+			//deltaMagnitudeDiff = Mathf.Sqrt(deltaMagnitudeDiff);
 		}else{
 			deltaMagnitudeDiff=-wheel* PlayerPrefs.GetInt(UserPrefs.scrollSpeed, 100);
 		}
@@ -198,7 +209,7 @@ public class GameMoveListener : MonoBehaviour {
 			return;
 			//TODO Give an instruction that you cant fire in the first turn
 		}
-		//TODO Put a layer mask on this.
+		//DONE Put a layer mask on this.
 		if(Physics.Raycast(ray,out hit,10000,mask)){
 			//DONE Divide this by a constant if you want to increase the area of the play
 			boxX=(int)Mathf.Floor(hit.point.x/GameContants.boxSize)+offsetHitX;

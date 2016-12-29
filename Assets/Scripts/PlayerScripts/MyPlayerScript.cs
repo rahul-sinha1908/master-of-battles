@@ -20,6 +20,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
 	private Animator[] playerAnim;
+	private PlayerControlScript[] playerControls;
 	private List<Moves> attackMoves;
 	public List<Moves> movesList;
 	public float moveSpeed=15f;
@@ -90,6 +91,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		Debug.Log("Toatal Players :"+players.Length);
 		playerObjects=new GameObject[players.Length];
 		playerAnim=new Animator[players.Length];
+		playerControls=new PlayerControlScript[players.Length];
 		for(int i=0;i<players.Length;i++){
 			//TODO Make the prefab dynamic instead of static
 			Vector3 creationPoint=new Vector3(players[i].x,0,players[i].y)+offset+playerHeight;
@@ -106,6 +108,7 @@ public class MyPlayerScript : NetworkBehaviour {
 			}
 			playerObjects[i]=go;
 			playerAnim[i]=go.GetComponent<Animator>();
+			playerControls[i]=go.GetComponent<PlayerControlScript>();
 			//go.layer=LayerMask.GetMask("Hello");
 		}
 	}
@@ -240,7 +243,10 @@ public class MyPlayerScript : NetworkBehaviour {
 		a=(v1.x-v2.x)*(v1.x-v2.x)+(v1.y-v2.y)*(v1.y-v2.y)+(v1.z-v2.z)*(v1.z-v2.z);
 		return a;
 	}
-	private void moveMyPlayer(GameObject g, PlayerDetails p, Animator anim){
+	private void moveMyPlayer(int i){
+		GameObject g=playerObjects[i];
+		PlayerDetails p=players[i];
+		Animator anim=playerAnim[i];
 		//TODO Do animation and stuffs
 		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
 		pos.x*=GameContants.boxSize;
@@ -259,12 +265,12 @@ public class MyPlayerScript : NetworkBehaviour {
 			g.transform.LookAt(pos);
 			anim.SetBool("Walk", true);
 		}
-		
+
 		// if(dir.sqrMagnitude>moveSpeed*moveSpeed*Time.deltaTime*Time.deltaTime)
 		// 	g.transform.position=ipos+dir*moveSpeed*Time.deltaTime;
 		// else
 		// 	g.transform.position=pos;
-		//playerObjects[i].transform.GetComponent<Rigidbody>().MovePosition((pos - playerObjects[i].transform.position)*moveSpeed*Time.deltaTime);
+		// playerObjects[i].transform.GetComponent<Rigidbody>().MovePosition((pos - playerObjects[i].transform.position)*moveSpeed*Time.deltaTime);
 	}
 	private bool reachedOnce=true;
 	private void Update () {
@@ -277,12 +283,12 @@ public class MyPlayerScript : NetworkBehaviour {
 					if(!comparePositions(playerObjects[i],players[i])){
 						startAttackSequence=false;
 						reachedOnce=false;
-						moveMyPlayer(playerObjects[i], players[i], playerAnim[i]);
+						moveMyPlayer(i);
 					}
 				}
 			}
 			if(!isLocalPlayer && startAttackSequence && !reachedOnce){
-				Debug.Log("It Entered Here 223");
+				Debug.Log("It Entered Here in Update");
 				StartCoroutine(doAttackSequence());
 				if(otherPlayerScript!=null)
 					otherPlayerScript.prepareForAttack();
@@ -296,6 +302,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private IEnumerator doAttackSequence(){
 		if(attackMoves.Count>0){
 			//TODO Do the attack Sequence
+			Debug.Log("Total Attack Sequence : "+isLocalPlayer+" : "+attackMoves.Count);
 			for(int i=0;i<attackMoves.Count;i++){
 				int x1,y1,x2,y2;
 				x1=players[attackMoves[i].ind].x;
@@ -303,10 +310,12 @@ public class MyPlayerScript : NetworkBehaviour {
 				x2=attackMoves[i].x;
 				y2=attackMoves[i].y;
 
-				GameObject go= GameObject.Instantiate(bulletPrefab,new Vector3(x1,0,y1), Quaternion.LookRotation((new Vector3(x2,0,y2)-new Vector3(x1,0,y1))));
-				go.GetComponent<Rigidbody>().AddForce(go.transform.forward*200, ForceMode.Impulse);
-				Debug.Log("initiate Attack : "+attackMoves[i].x+" : "+attackMoves[i].y);
-				Destroy(go,2);
+				PowerStruct p = PowersContants.setPowerDef(attackMoves[i].attackDef);
+				playerControls[attackMoves[i].ind].doAttack(p);
+				// GameObject go= GameObject.Instantiate(bulletPrefab,new Vector3(x1,0,y1), Quaternion.LookRotation((new Vector3(x2,0,y2)-new Vector3(x1,0,y1))));
+				// go.GetComponent<Rigidbody>().AddForce(go.transform.forward*200, ForceMode.Impulse);
+				// Debug.Log("initiate Attack : "+attackMoves[i].x+" : "+attackMoves[i].y);
+				// Destroy(go,2);
 			}
 		}
 		attackMoves.Clear();
@@ -318,6 +327,8 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 	public void prepareForAttack(){
 		//DONE call prepare for next
+		if(isLocalPlayer)
+			Debug.Log("It Came Here prepare for Attack");
 		StartCoroutine(doAttackSequence());
 	}
 	public void prepareForNext(){

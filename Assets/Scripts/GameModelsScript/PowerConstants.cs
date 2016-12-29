@@ -10,6 +10,7 @@ namespace MasterOfBattles{
 	};
 	public struct PowerStruct{
 		public int id,strength,range;
+		public string otherDef;
 	};
 
 	public class PowersContants{

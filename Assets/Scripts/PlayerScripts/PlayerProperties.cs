@@ -57,7 +57,7 @@ public class PlayerProperties {
 		healthMetre= PlayerPrefs.GetInt(fileName+"Health",GameContants.DefaultHealth);
 	}
 	public void addPowers(int id, int strength, int range){
-		PowerStruct power;
+		PowerStruct power=new PowerStruct();
 		power.id=id;
 		power.strength=strength;
 		power.range=range;
