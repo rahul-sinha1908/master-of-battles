@@ -9,7 +9,9 @@ public class PlayerControlScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		anim=GetComponent<Animator>();
-		particles=GetComponent<ParticleSystem>();
+		particles=transform.FindChild("Particle System").GetComponent<ParticleSystem>();
+		if(particles==null)
+			Debug.Log("Particle is Null");
 		//doAttack(new PowerStruct());
 	}
 	
