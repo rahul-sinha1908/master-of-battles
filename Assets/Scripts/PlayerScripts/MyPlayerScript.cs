@@ -263,7 +263,10 @@ public class MyPlayerScript : NetworkBehaviour {
 		if(sqrDist(ipos,pos)<1.5*1.5){
 			g.transform.position=new Vector3(pos.x,g.transform.position.y,pos.z);
 			anim.SetBool("Walk", false);
-			g.transform.LookAt(new Vector3(g.transform.position.x,g.transform.position.y,opponentPost.z));
+			if(isLocalPlayer)
+				g.transform.LookAt(new Vector3(g.transform.position.x,g.transform.position.y,opponentPost.z));
+			else
+				g.transform.LookAt(new Vector3(g.transform.position.x,g.transform.position.y,-opponentPost.z));
 		}else{
 			cc.Move(dir*10*Time.deltaTime);
 			g.transform.LookAt(pos);
