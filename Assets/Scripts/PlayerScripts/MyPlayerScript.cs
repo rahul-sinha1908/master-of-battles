@@ -99,6 +99,10 @@ public class MyPlayerScript : NetworkBehaviour {
 			creationPoint.z*=GameContants.boxSize;
 			//Debug.Log("For "+i+" : "+creationPoint);
 			GameObject go = GameObject.Instantiate(prefab,creationPoint,Quaternion.identity);
+			if(isLocalPlayer)
+				go.transform.LookAt(new Vector3(go.transform.position.x,go.transform.position.y,opponentPost.z));
+			else
+				go.transform.LookAt(new Vector3(go.transform.position.x,go.transform.position.y,-opponentPost.z));
 			if(myTeam){
 				go.transform.tag="MyTeam";
 				go.name="MyTeam"+players[i].ind;
@@ -259,7 +263,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		if(sqrDist(ipos,pos)<1.5*1.5){
 			g.transform.position=new Vector3(pos.x,g.transform.position.y,pos.z);
 			anim.SetBool("Walk", false);
-			g.transform.LookAt(new Vector3(g.transform.position.x,transform.position.y,opponentPost.z));
+			g.transform.LookAt(new Vector3(g.transform.position.x,g.transform.position.y,opponentPost.z));
 		}else{
 			cc.Move(dir*10*Time.deltaTime);
 			g.transform.LookAt(pos);

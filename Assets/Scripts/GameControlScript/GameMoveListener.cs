@@ -78,25 +78,9 @@ public class GameMoveListener : MonoBehaviour {
 		}else{
 			deltaMagnitudeDiff=-wheel* PlayerPrefs.GetInt(UserPrefs.scrollSpeed, 100);
 		}
-
-		// If the camera is orthographic...
-		if (cam.orthographic)
-		{
-			// ... change the orthographic size based on the change in distance between the touches.
-			cam.orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
-
-			// Make sure the orthographic size never drops below zero.
-			cam.orthographicSize = Mathf.Max(cam.orthographicSize, 0.1f);
-		}
-		else
-		{
-			// Otherwise change the field of view based on the change in distance between the touches.
-			cam.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
-
-			// Clamp the field of view to make sure it's between 0 and 180.
-			cam.fieldOfView = Mathf.Clamp(cam.fieldOfView, 0.1f, 179.9f);
-		}
-
+		
+		if(!(cam.transform.position.y<5 && cam.transform.position.y+deltaMagnitudeDiff<cam.transform.position.y))
+			cam.transform.Translate(-cam.transform.forward*deltaMagnitudeDiff, Space.World);
 	}
 	
 	private bool compareTwoPlayerDetails(PlayerDetails a, PlayerDetails b){
@@ -168,6 +152,8 @@ public class GameMoveListener : MonoBehaviour {
 		}
 	}
 	private void Pan(Vector2 touchDeltaPosition){
+		if(!isServer)
+			touchDeltaPosition=-touchDeltaPosition;
 		if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x-touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
 			touchDeltaPosition.x=0;
 		//TODO Take care of this constant value if ever camera position is changed
