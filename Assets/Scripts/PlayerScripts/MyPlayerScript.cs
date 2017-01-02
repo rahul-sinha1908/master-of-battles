@@ -19,7 +19,6 @@ public class MyPlayerScript : NetworkBehaviour {
 	private Vector3 opponentPost=new Vector3(0,0,GameContants.sizeOfBoardY*GameContants.boxSize);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
-	private Animator[] playerAnim;
 	private PlayerControlScript[] playerControls;
 	private List<Moves> attackMoves;
 	public List<Moves> movesList;
@@ -90,7 +89,6 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void createPlayer(bool myTeam){
 		Debug.Log("Toatal Players :"+players.Length);
 		playerObjects=new GameObject[players.Length];
-		playerAnim=new Animator[players.Length];
 		playerControls=new PlayerControlScript[players.Length];
 		for(int i=0;i<players.Length;i++){
 			//TODO Make the prefab dynamic instead of static
@@ -111,8 +109,12 @@ public class MyPlayerScript : NetworkBehaviour {
 				go.name="OpponentTeam"+players[i].ind;
 			}
 			playerObjects[i]=go;
-			playerAnim[i]=go.GetComponent<Animator>();
 			playerControls[i]=go.GetComponent<PlayerControlScript>();
+			if(isLocalPlayer)
+				playerControls[i].initializePlayer(isServer, isLocalPlayer, chess.gameFormation[i], this);
+			else{
+				playerControls[i].initializePlayer(isServer, isLocalPlayer, this);
+			}
 			//go.layer=LayerMask.GetMask("Hello");
 		}
 	}
@@ -202,6 +204,16 @@ public class MyPlayerScript : NetworkBehaviour {
 		createPlayer(false);
 	}
 
+	[Command]
+	public void CmdKillPlayer(short i){
+		killFromNetwork(i);
+	}
+
+	[ClientRpc]
+	public void RpcKillPlayer(short i){
+		killFromNetwork(i);
+	}
+
 //Remote Calls Till Here
 	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
@@ -242,42 +254,21 @@ public class MyPlayerScript : NetworkBehaviour {
 			return true;
 		return false;
 	}
-	private float sqrDist(Vector3 v1, Vector3 v2){
-		float a=0;
-		a=(v1.x-v2.x)*(v1.x-v2.x)+(v1.y-v2.y)*(v1.y-v2.y)+(v1.z-v2.z)*(v1.z-v2.z);
-		return a;
-	}
 	private void moveMyPlayer(int i){
-		GameObject g=playerObjects[i];
-		PlayerDetails p=players[i];
-		Animator anim=playerAnim[i];
-		//TODO Do animation and stuffs
-		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
-		pos.x*=GameContants.boxSize;
-		pos.z*=GameContants.boxSize;
-		Vector3 ipos=g.transform.position;
-		Vector3 dir =  (pos-ipos);
-		dir.Normalize();
-		CharacterController cc=g.GetComponent<CharacterController>();
-		
-		if(sqrDist(ipos,pos)<1.5*1.5){
-			g.transform.position=new Vector3(pos.x,g.transform.position.y,pos.z);
-			anim.SetBool("Walk", false);
-			if(isLocalPlayer)
-				g.transform.LookAt(new Vector3(g.transform.position.x,g.transform.position.y,opponentPost.z));
-			else
-				g.transform.LookAt(new Vector3(g.transform.position.x,g.transform.position.y,-opponentPost.z));
-		}else{
-			cc.Move(dir*10*Time.deltaTime);
-			g.transform.LookAt(pos);
-			anim.SetBool("Walk", true);
-		}
+		playerControls[i].movePlayer(players[i]);		
+	}
 
-		// if(dir.sqrMagnitude>moveSpeed*moveSpeed*Time.deltaTime*Time.deltaTime)
-		// 	g.transform.position=ipos+dir*moveSpeed*Time.deltaTime;
-		// else
-		// 	g.transform.position=pos;
-		// playerObjects[i].transform.GetComponent<Rigidbody>().MovePosition((pos - playerObjects[i].transform.position)*moveSpeed*Time.deltaTime);
+	public void killThePlayer(int i){
+		if(isServer){
+			RpcKillPlayer((short)i);
+		}else{
+			CmdKillPlayer((short)i);
+		}
+		Destroy(playerObjects[i],2f);
+	}
+	private void killFromNetwork(int i){
+		playerControls[i].doKillAnimation();
+		Destroy(playerObjects[i],2f);
 	}
 	private bool reachedOnce=true;
 	private void Update () {
@@ -312,17 +303,14 @@ public class MyPlayerScript : NetworkBehaviour {
 			Debug.Log("Total Attack Sequence : "+isLocalPlayer+" : "+attackMoves.Count);
 			for(int i=0;i<attackMoves.Count;i++){
 				int x1,y1,x2,y2;
-				x1=players[attackMoves[i].ind].x;
-				y1=players[attackMoves[i].ind].y;
+				int ind=attackMoves[i].ind;
+				x1=players[ind].x;
+				y1=players[ind].y;
 				x2=attackMoves[i].x;
 				y2=attackMoves[i].y;
 
-				PowerStruct p = PowersContants.setPowerDef(attackMoves[i].attackDef);
-				playerControls[attackMoves[i].ind].doAttack(p);
-				// GameObject go= GameObject.Instantiate(bulletPrefab,new Vector3(x1,0,y1), Quaternion.LookRotation((new Vector3(x2,0,y2)-new Vector3(x1,0,y1))));
-				// go.GetComponent<Rigidbody>().AddForce(go.transform.forward*200, ForceMode.Impulse);
-				// Debug.Log("initiate Attack : "+attackMoves[i].x+" : "+attackMoves[i].y);
-				// Destroy(go,2);
+				PowerStruct p = PowersContants.getPowerStruct(attackMoves[i].attackDef);
+				playerControls[ind].doAttack(x1,y1,x2,y2,p);
 			}
 		}
 		attackMoves.Clear();

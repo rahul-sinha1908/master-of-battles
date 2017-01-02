@@ -71,7 +71,7 @@
 		"Assets/Materials":true,
 		"Assets/Prefabs":true,
 		//"Assembly-CSharp-firstpass.csproj":true,
-		"Assembly-CSharp-Editor.csproj":true,
+		//"Assembly-CSharp-Editor.csproj":true,
 		//"MasterOfBattles.sln":true,
 		//"MyIntelliSense.sln":true,
 		"MyIntelliSense.csproj":true,

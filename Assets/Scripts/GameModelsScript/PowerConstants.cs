@@ -40,12 +40,14 @@ namespace MasterOfBattles{
 			return instance;
 		}
 
-		public static string getPowerDef(PowerStruct p){
+		public static string getPowerDefString(PowerStruct p){
+			//TODO Make the Power From Here
 			string s="";
 
 			return s;
 		}
-		public static PowerStruct setPowerDef(string s){
+		public static PowerStruct getPowerStruct(string s){
+			//TODO Retrieve the Power From here
 			PowerStruct p = new PowerStruct();
 			
 			return p;
