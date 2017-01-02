@@ -66,13 +66,12 @@ public class PlayerControlScript : MonoBehaviour {
 		var main=particles.main;
 		var shape=particles.shape;
 		var emission=particles.emission;
-		shape.enabled=false;
-		emission.enabled=true;
 		main.duration=1;
 		main.startSpeed=5;
 		main.loop=false;
-		main.duration=1;
 		main.startLifetime=10;
+		shape.enabled=false;
+		emission.enabled=true;
 		Debug.Log("Its Just Before Play");
 		particles.Play();
 

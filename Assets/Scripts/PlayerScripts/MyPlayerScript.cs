@@ -8,7 +8,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private GameObject otherPlayer;
 	private MyPlayerScript otherPlayerScript;
 	private PowersContants powerDatabase;
-	public GameObject prefab, bulletPrefab;
+	public GameObject prefab;
 	public GameObject timerPrefab;
 	private GameObject timeObject;
 	private TimeTracker timeTracker;
@@ -91,11 +91,11 @@ public class MyPlayerScript : NetworkBehaviour {
 		playerObjects=new GameObject[players.Length];
 		playerControls=new PlayerControlScript[players.Length];
 		for(int i=0;i<players.Length;i++){
-			//TODO Make the prefab dynamic instead of static
+			//TODO Take the prefab dynamic from Resource Folder according to players[i].playerType
+			//prefab=Resources.Load("path of file");
 			Vector3 creationPoint=new Vector3(players[i].x,0,players[i].y)+offset+playerHeight;
 			creationPoint.x*=GameContants.boxSize;
 			creationPoint.z*=GameContants.boxSize;
-			//Debug.Log("For "+i+" : "+creationPoint);
 			GameObject go = GameObject.Instantiate(prefab,creationPoint,Quaternion.identity);
 			if(isLocalPlayer)
 				go.transform.LookAt(new Vector3(go.transform.position.x,go.transform.position.y,opponentPost.z));
