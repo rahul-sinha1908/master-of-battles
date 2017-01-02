@@ -43,16 +43,13 @@ public class PlayerControlScript : MonoBehaviour {
 		isServer=server;
 		isLocalPlayer=local;
 		opponentPost=GameContants.sizeOfBoardY*GameContants.boxSize;
-		if(!isServer)
+		if((isServer && !isLocalPlayer) || (!isServer && isLocalPlayer))
 			opponentPost=opponentPost*-1;
-		if(!isLocalPlayer)
-			opponentPost=opponentPost*-1;
-
 		me=player;
 		playerNetScript=playNet;
 	}
 	public void initializePlayer(bool server, bool local, MyPlayerScript playNet){
-		initializePlayer(isServer, isLocalPlayer, null, playNet);
+		initializePlayer(server, local, null, playNet);
 	}
 
 	public void doAttack(int x1, int y1, int x2, int y2, PowerStruct p){
@@ -82,10 +79,10 @@ public class PlayerControlScript : MonoBehaviour {
 		//TODO Assign the correct value for substracting the health
 		int val=10;
 
-		Vector3 pos=new Vector3(x1,0, y1)+playerHeight+offset;
+		Vector3 pos=new Vector3(x1,1, y1)+playerHeight+offset;
 		pos.x*=GameContants.boxSize;
 		pos.z*=GameContants.boxSize;
-		Vector3 pos1=new Vector3(x2,0, y2)+playerHeight+offset;
+		Vector3 pos1=new Vector3(x2,1, y2)+playerHeight+offset;
 		pos1.x*=GameContants.boxSize;
 		pos1.z*=GameContants.boxSize;
 
@@ -95,6 +92,7 @@ public class PlayerControlScript : MonoBehaviour {
 		RaycastHit hit;
 		if(Physics.Raycast(pos, dir, out hit , GameContants.boxSize*(GameContants.sizeOfBoardX+GameContants.sizeOfBoardY),attackMask)){
 			GameObject g=hit.collider.gameObject;
+			Debug.Log("Hit the target : "+g.name);
 			if(g!=null){
 				PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
 				if(pl!=null)
@@ -106,6 +104,7 @@ public class PlayerControlScript : MonoBehaviour {
 		Debug.Log("Hit the player : "+transform.name);
 		if(isLocalPlayer){
 			me.curHealth-=val;
+			Debug.Log("Cur Health : "+me.curHealth);
 			if(me.curHealth<=0){
 				isAlive=false;
 				playerNetScript.killThePlayer(me.playerIndex);
@@ -135,10 +134,7 @@ public class PlayerControlScript : MonoBehaviour {
 		if(GameMethods.sqrDist(ipos,pos)<1.5*1.5){
 			transform.position=new Vector3(pos.x,transform.position.y,pos.z);
 			anim.SetBool("Walk", false);
-			if(isLocalPlayer)
-				transform.LookAt(new Vector3(transform.position.x,transform.position.y,opponentPost));
-			else
-				transform.LookAt(new Vector3(transform.position.x,transform.position.y,-opponentPost));
+			transform.LookAt(new Vector3(transform.position.x,transform.position.y,opponentPost));
 		}else{
 			controller.Move(dir*10*Time.deltaTime);
 			transform.LookAt(pos);

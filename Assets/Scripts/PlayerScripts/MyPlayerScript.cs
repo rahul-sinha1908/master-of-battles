@@ -211,6 +211,8 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcKillPlayer(short i){
+		if(isServer)
+			return;
 		killFromNetwork(i);
 	}
 
