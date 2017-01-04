@@ -104,11 +104,6 @@ public class GameMoveListener : MonoBehaviour {
 		ray=Camera.main.ScreenPointToRay(vect);
 		performActionOnHit(ray, false);
 	}
-	private float sqrDist(Vector3 v1, Vector3 v2){
-		float a=0;
-		a=(v1.x-v2.x)*(v1.x-v2.x)+(v1.y-v2.y)*(v1.y-v2.y)+(v1.z-v2.z)*(v1.z-v2.z);
-		return a;
-	}
 
 	private void checkClickListener(){
 		if(!isClicksActive)
@@ -133,7 +128,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		else{
 			if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Began){
-				if(sqrDist(trackClickVect, Input.GetTouch(0).position)<25)
+				if(GameMethods.sqrDist(trackClickVect, Input.GetTouch(0).position)<25)
 					DoubleClick(trackClickVect);
 				trackClicks=false;
 			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
@@ -402,6 +397,7 @@ public class GameMoveListener : MonoBehaviour {
 				}
 			}
 		}
+		listPossibleMoves=list;
 		selectScript.addSelectedTiles(list,BoardConstants.Move);
 	}
 	private int checKThePlayerAt(Point p){
@@ -484,5 +480,20 @@ public class GameMoveListener : MonoBehaviour {
 		isClicksActive=false;
 		yield return new WaitForSeconds(0.2f);
 		isClicksActive=true;
+	}
+	public void Move(Vector2 v){
+		if(selectedPlayerInd==-1)
+			return;
+		int i=selectedPlayerInd;
+		Point p=new Point();
+		p.x=players[i].x;
+		p.y=players[i].y;
+		p.x+=(int)v.x;
+		p.y+=(int)v.y;
+		if(isPossibleMove(p)){
+			players[i].x=(short)p.x;
+			players[i].y=(short)p.y;
+		}
+
 	}
 }

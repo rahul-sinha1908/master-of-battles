@@ -50,6 +50,9 @@ public class InputManager: MonoBehaviour{
 
 		//if(Input.GetKey(KeyCode.))
 		Vector2 v= checkInputs();
+		if(v!=Vector2.zero){
+			gameMove.Move(v);
+		}
 	}
 	private void checkTime(){
 		if(timeTracker==null)
@@ -77,18 +80,26 @@ public class InputManager: MonoBehaviour{
 		Vector2 v=new Vector2();
 		if(Application.isMobilePlatform){
 			if(CrossPlatformInputManager.GetButtonDown("UpButton")){
-				
+				v.y=1;
 			}else if(CrossPlatformInputManager.GetButtonDown("DownButton")){
-				
+				v.y=-1;
 			}else if(CrossPlatformInputManager.GetButtonDown("LeftButton")){
-				
+				v.x=-1;
 			}else if(CrossPlatformInputManager.GetButtonDown("RightButton")){
-				
+				v.x=1;
 			}else if(CrossPlatformInputManager.GetButtonDown("MultipleSelect")){
 				
 			}
 		}else{
-
+			if(Input.GetKeyDown(KeyCode.W)){
+				v.y=1;
+			}else if(Input.GetKeyDown(KeyCode.S)){
+				v.y=-1;
+			}else if(Input.GetKeyDown(KeyCode.A)){
+				v.x=-1;
+			}else if(Input.GetKeyDown(KeyCode.D)){
+				v.x=1;
+			}
 		}
 		return v;
 	}
