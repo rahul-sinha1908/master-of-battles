@@ -185,6 +185,9 @@ public class GameMoveListener : MonoBehaviour {
 			}
 			
 		}
+		if(selectedPlayerInd!=-1){
+			inputManager.showHealthValue(playerProp[selectedPlayerInd].curHealth);
+		}
 	}
 	private void setDefaultCameraPostion(){
 		cam.transform.position=defaultCamVector;

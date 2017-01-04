@@ -16,6 +16,7 @@ public class PlayerControlScript : MonoBehaviour {
 	private PlayerProperties me;
 	private bool isAlive;
 	private MyPlayerScript playerNetScript;
+	private InputManager inputManager;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +27,8 @@ public class PlayerControlScript : MonoBehaviour {
 		controller=GetComponent<CharacterController>();
 		if(particles==null)
 			Debug.Log("Particle is Null");
+
+		inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
 		//doAttack(new PowerStruct());
 	}
 	
@@ -146,5 +149,8 @@ public class PlayerControlScript : MonoBehaviour {
 	private bool isVisibleToCam(){
 
 		return false;
+	}
+	public void setAsSelectedPlayer(){
+		//inputManager.showHealthValue(me.curHealth);
 	}
 }

@@ -18,8 +18,8 @@ public class InputManager: MonoBehaviour{
 	[SerializeField]
 	private GameObject WeaponInventory;
 	[SerializeField]
-	private GameObject sendButton,timeWindow;
-	private Text timeText;
+	private GameObject sendButton,timeWindow, healthBar;
+	private Text timeText,healthBarText;
 	private TimeTracker timeTracker;
 	private bool checkEnteredCounter=false;
 	private MyPlayerScript myPlayer;
@@ -42,6 +42,7 @@ public class InputManager: MonoBehaviour{
 	}
 	private void init(){
 		timeText=timeWindow.GetComponent<Text>();
+		healthBarText=healthBar.GetComponent<Text>();
 	}
 	void Update()
 	{
@@ -107,10 +108,6 @@ public class InputManager: MonoBehaviour{
 		}
 
 	}
-	public void movement(bool isLeft, bool isUp){
-		StartCoroutine(sendMovesAfter2());
-	}
-
 	public void setMyPlayerScript(MyPlayerScript myPlayer, TimeTracker track, GameMoveListener moveList){
 		this.myPlayer=myPlayer;
 		timeTracker=track;
@@ -123,5 +120,13 @@ public class InputManager: MonoBehaviour{
 				//My Code Here
 			}
 		}
+	}
+	public void showHealthValue(int health){
+		//Debug.Log("Its here : "+health);
+		if(healthBarText!=null){
+			string s="Health :"+health;
+			healthBarText.text=s;
+		}else
+			Debug.Log("Its Null");
 	}
 }
