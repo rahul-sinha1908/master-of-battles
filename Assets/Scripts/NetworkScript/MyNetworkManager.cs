@@ -32,6 +32,7 @@ public class MyNetworkManager : NetworkManager {
 		NetworkManager.singleton.StartHost();
 		networkDisc.broadcastData="My Game";
 		networkDisc.Initialize();
+		networkDisc.broadcastData="My Game";
 		networkDisc.StartAsServer();
 	}
 
@@ -56,6 +57,8 @@ public class MyNetworkManager : NetworkManager {
 		GameObject goButton = (GameObject)Instantiate(buttonPrefab);
 		goButton.transform.SetParent(panelToAdd, false);
 		goButton.transform.localScale = new Vector3(1, 1, 1);
+		Text t= goButton.GetComponentInChildren<Text>();
+		t.text=x.name+" ("+x.ip+")";
 
 		Button tempButton = goButton.GetComponent<Button>();
 

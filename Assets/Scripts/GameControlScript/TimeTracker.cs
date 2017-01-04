@@ -103,18 +103,11 @@ public class TimeTracker : NetworkBehaviour {
 		else
 			playerCountDownServer=true;
 	}
-	
-	private void OnGUI()
-	{
-		string s="Time Left : "+timeleft+" sec";
-		if(timeleft==-1){
-			s="Send Moves";
-		}
-		if(GUI.Button(new Rect(100,100,100,50),s)){
-			if(!isServer)
-				clientPlayerScript.changeClientCountDown(true);
-			else
-				playerCountDownServer=true;
-		}
+	public void sendMovesFromTimeTracker(){
+		//TODO Send Moves From TimeTracker on Click Of the Button
+		if(!isServer)
+			clientPlayerScript.changeClientCountDown(true);
+		else
+			playerCountDownServer=true;
 	}
 }

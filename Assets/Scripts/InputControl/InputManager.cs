@@ -29,8 +29,8 @@ public class InputManager: MonoBehaviour{
 			OtherPlatform.SetActive(true);
 		}
 		if(Application.platform==RuntimePlatform.LinuxEditor){
-			MobilePlatform.SetActive(true);
-			OtherPlatform.SetActive(false);
+			// MobilePlatform.SetActive(true);
+			// OtherPlatform.SetActive(false);
 		}
 
 	}
@@ -45,7 +45,7 @@ public class InputManager: MonoBehaviour{
 		for(int i=0;i<2;i++){
 			yield return new WaitForEndOfFrame();
 		}
-		
+
 	}
 	public void movement(bool isLeft, bool isUp){
 		StartCoroutine(sendMovesAfter2());
