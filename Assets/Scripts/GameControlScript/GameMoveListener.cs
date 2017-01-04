@@ -488,8 +488,13 @@ public class GameMoveListener : MonoBehaviour {
 		Point p=new Point();
 		p.x=players[i].x;
 		p.y=players[i].y;
-		p.x+=(int)v.x;
-		p.y+=(int)v.y;
+		if(isServer){
+			p.x+=(int)v.x;
+			p.y+=(int)v.y;
+		}else{
+			p.x-=(int)v.x;
+			p.y-=(int)v.y;
+		}
 		if(isPossibleMove(p)){
 			players[i].x=(short)p.x;
 			players[i].y=(short)p.y;
