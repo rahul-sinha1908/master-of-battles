@@ -408,14 +408,14 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		return -1;
 	}
-	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj){
+	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj, TimeTracker track){
 		this.isServer=isServer;
 		if(!isServer){
 			//TODO change the location of the camera
 			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
 			cam.transform.LookAt(transform.position);
 		}
-		inputManager.setMyPlayerScript(obj);
+		inputManager.setMyPlayerScript(obj,track);
 		myPlayerScript=obj;
 		players=myPlayerScript.getPlayerDetails();
 		moves=myPlayerScript.movesList;
