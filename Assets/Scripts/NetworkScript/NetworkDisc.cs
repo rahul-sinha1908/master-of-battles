@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,7 +11,9 @@ public struct IPS{
 public class NetworkDisc : NetworkDiscovery
 {
 	bool b=true;
-	public LinkedList<IPS> list=new LinkedList<IPS>();
+	public List<IPS> list=new List<IPS>();
+	[SerializeField]
+	public MyNetworkManager manager;
 
 	public override void OnReceivedBroadcast (string fromAddress, string data)
 	{
@@ -21,9 +24,9 @@ public class NetworkDisc : NetworkDiscovery
 		//NetworkManager.singleton.StartClient ();
 		bool b = true;
 
-		for (LinkedListNode<IPS> l = list.First; l != null; l = l.Next) {
-			IPS i = l.Value;
-			if (fromAddress == i.ip) {
+		for (int i=0;i<list.Count;i++) {
+			IPS k = list[i];
+			if (fromAddress == k.ip) {
 				b = false;
 				break;
 			}
@@ -32,12 +35,14 @@ public class NetworkDisc : NetworkDiscovery
 			IPS i;
 			i.ip = fromAddress;
 			i.name = data;
-			LinkedListNode<IPS> node = new LinkedListNode<IPS> (i);
-			list.AddLast (node);
+			list.Add(i);
+			if(manager==null)
+				manager=GameObject.Find("NetworkManager").GetComponent<MyNetworkManager>();
+			manager.AddButtons(i);
 		}
 		Debug.Log (list.Count);
 		//StopBroadcast ();
 
 	}
-
+	
 }

@@ -6,7 +6,7 @@ using UnityStandardAssets.CrossPlatformInput;
 using MasterOfBattles;
 
 public class GameMoveListener : MonoBehaviour {
-
+	private InputManager inputManager;
 	private int offsetHitX=GameContants.sizeOfBoardX/2;
 	private int offsetHitY=GameContants.sizeOfBoardY/2;
 	private PowersContants powerDatabase;
@@ -40,6 +40,8 @@ public class GameMoveListener : MonoBehaviour {
 		cam = Camera.main;
 		defaultCamVector=cam.transform.position;
 		defaultFeildOfView=cam.fieldOfView;
+
+		inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
 
 		powerDatabase=PowersContants.getInstance();
 		chess=ChessBoardFormation.getInstance();
@@ -118,7 +120,7 @@ public class GameMoveListener : MonoBehaviour {
 				trackClicks=true;
 				trackClickCount=0f;
 			}
-			else if(CrossPlatformInputManager.GetButtonDown("Fire1")){
+			else if(Input.GetButtonDown("Fire1")){
 				trackClickVect=Input.mousePosition;
 				trackClicks=true;
 				trackClickCount=0f;
@@ -137,13 +139,13 @@ public class GameMoveListener : MonoBehaviour {
 			}else if(Input.touchCount==1 && Input.GetTouch(0).phase==TouchPhase.Moved){
 				trackClicks=false;
 			}
-			else if(CrossPlatformInputManager.GetButtonDown("Fire1"))
+			else if(Input.GetButtonDown("Fire1"))
 			{
 				//Debug.LogError("It Entered Here3 : "+CrossPlatformInputManager.GetButtonDown("Fire1"));
 				if(Vector2.Distance(trackClickVect, Input.mousePosition)<5)
 					DoubleClick(trackClickVect);
 				trackClicks=false;
-			}else if(CrossPlatformInputManager.GetButton("Fire1")){
+			}else if(Input.GetButton("Fire1")){
 				if(Vector2.Distance(trackClickVect, Input.mousePosition)>5){
 					trackClicks=false;
 				}
@@ -172,9 +174,9 @@ public class GameMoveListener : MonoBehaviour {
         }else if(Input.GetAxis("Mouse ScrollWheel")!=0){
 			Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
 			detectZoom(Input.GetAxis("Mouse ScrollWheel"));
-		}else if(CrossPlatformInputManager.GetButtonDown("Fire1")){
+		}else if(Input.GetButtonDown("Fire1")){
 			trackDragVect=Input.mousePosition;
-		}else if(CrossPlatformInputManager.GetButton("Fire1")){
+		}else if(Input.GetButton("Fire1")){
 			if(Input.mousePosition!=trackDragVect){
 				Vector2 delta=Input.mousePosition-trackDragVect;
 				trackDragVect=Input.mousePosition;
@@ -413,6 +415,7 @@ public class GameMoveListener : MonoBehaviour {
 			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
 			cam.transform.LookAt(transform.position);
 		}
+		inputManager.setMyPlayerScript(obj);
 		myPlayerScript=obj;
 		players=myPlayerScript.getPlayerDetails();
 		moves=myPlayerScript.movesList;

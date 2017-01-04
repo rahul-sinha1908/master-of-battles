@@ -1,12 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 using System;
 
 public class MyNetworkManager : NetworkManager {
 
 	//TODO Restrict Adding more than one Client
+	[SerializeField]
+	private NetworkDisc networkDisc;
+	public GameObject mainMenu, searchHosts;
+	public GameObject  buttonPrefab;
+	public RectTransform panelToAdd;
+
 
 	// public override void OnServerAddPlayer (NetworkConnection conn, short playerControllerId)
 	// {
@@ -19,4 +26,43 @@ public class MyNetworkManager : NetworkManager {
 	// 	onlineScene = "Level1";
 	// 	base.OnStartServer ();
 	// }
+
+	public void StartAsHost(){
+		NetworkManager.singleton.networkPort=1908;
+		NetworkManager.singleton.StartHost();
+		networkDisc.broadcastData="My Game";
+		networkDisc.Initialize();
+		networkDisc.StartAsServer();
+	}
+
+	public void StartAsClient(string address){
+		NetworkManager.singleton.networkPort=1908;
+		NetworkManager.singleton.networkAddress=address;
+		networkDisc.StopBroadcast();
+		NetworkManager.singleton.StartClient();
+	}
+
+	public override void OnServerConnect(NetworkConnection conn){
+		base.OnServerConnect(conn);
+		networkDisc.StopBroadcast();
+	}
+	public void SearchForHosts(){
+		networkDisc.Initialize();
+		networkDisc.StartAsClient();
+		mainMenu.SetActive(false);
+		searchHosts.SetActive(true);
+	}
+	public void AddButtons(IPS x){
+		GameObject goButton = (GameObject)Instantiate(buttonPrefab);
+		goButton.transform.SetParent(panelToAdd, false);
+		goButton.transform.localScale = new Vector3(1, 1, 1);
+
+		Button tempButton = goButton.GetComponent<Button>();
+
+		tempButton.onClick.AddListener(() => onClickButton(x.ip));
+	}
+	public void onClickButton(string address){
+		StartAsClient(address);
+	}
 }
+
