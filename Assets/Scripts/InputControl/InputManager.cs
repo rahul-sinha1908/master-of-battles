@@ -23,6 +23,7 @@ public class InputManager: MonoBehaviour{
 	private TimeTracker timeTracker;
 	private bool checkEnteredCounter=false;
 	private MyPlayerScript myPlayer;
+	private GameMoveListener gameMove;
 	void Start()
 	{
 		OtherPlatform.SetActive(true);
@@ -86,15 +87,17 @@ public class InputManager: MonoBehaviour{
 				
 			}
 		}else{
-			
+
 		}
 		return v;
 	}
 	public void disconnect(){
+		gameMove.disableClicksforX();
 		NetworkManager.singleton.StopClient();
 	}
 	public void sendMoves(){
 		Debug.Log("Sending Moves");
+		gameMove.disableClicksforX();
 		timeTracker.sendMovesFromTimeTracker();
 		sendButton.SetActive(false);
 	}
@@ -108,9 +111,10 @@ public class InputManager: MonoBehaviour{
 		StartCoroutine(sendMovesAfter2());
 	}
 
-	public void setMyPlayerScript(MyPlayerScript myPlayer, TimeTracker track){
+	public void setMyPlayerScript(MyPlayerScript myPlayer, TimeTracker track, GameMoveListener moveList){
 		this.myPlayer=myPlayer;
 		timeTracker=track;
+		gameMove=moveList;
 	}
 
 	private void waitForKeys(){

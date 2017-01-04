@@ -415,7 +415,7 @@ public class GameMoveListener : MonoBehaviour {
 			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
 			cam.transform.LookAt(transform.position);
 		}
-		inputManager.setMyPlayerScript(obj,track);
+		inputManager.setMyPlayerScript(obj,track,this);
 		myPlayerScript=obj;
 		players=myPlayerScript.getPlayerDetails();
 		moves=myPlayerScript.movesList;
@@ -469,5 +469,17 @@ public class GameMoveListener : MonoBehaviour {
 		for(int i=0;i<backUpMoves.Length;i++){
 			backUpMoves[i]=players[i];
 		}
+	}
+	public void disableClicksforX(){
+		Debug.Log("DeActivate");
+		StartCoroutine(stopClicks());
+	}
+	private IEnumerator stopClicks(){
+		if(!isClicksActive)
+			yield break;
+		trackClicks=false;
+		isClicksActive=false;
+		yield return new WaitForSeconds(0.2f);
+		isClicksActive=true;
 	}
 }
