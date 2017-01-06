@@ -51,6 +51,7 @@ public class InputManager: MonoBehaviour{
 		//if(Input.GetKey(KeyCode.))
 		Vector2 v= checkInputs();
 		if(v!=Vector2.zero){
+			gameMove.disableClicksforX();
 			gameMove.Move(v);
 		}
 	}

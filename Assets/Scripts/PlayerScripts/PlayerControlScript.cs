@@ -153,4 +153,10 @@ public class PlayerControlScript : MonoBehaviour {
 	public void setAsSelectedPlayer(){
 		//inputManager.showHealthValue(me.curHealth);
 	}
+	void OnControllerColliderHit(ControllerColliderHit other){
+		//Debug.Log ("Hello : "+other.gameObject.tag);
+		Debug.Log("Other Collider Hit : "+other.collider.name);
+		if(other.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects"))
+			controller.Move(transform.right*Time.deltaTime);
+	}
 }

@@ -163,6 +163,7 @@ public class GameMoveListener : MonoBehaviour {
 		checkClickListener();
 		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
+			touchDeltaPosition=touchDeltaPosition*PlayerPrefs.GetFloat(UserPrefs.mobPanSensitivity, 0.2f);
 			Pan(touchDeltaPosition);
         }else if (Input.touchCount == 2){
 			detectZoom(0);
