@@ -56,8 +56,11 @@ public class InputManager: MonoBehaviour{
 		}
 	}
 	private void checkTime(){
-		if(timeTracker==null)
-			timeTracker=GameObject.Find("TimeTracker(Clone)").GetComponent<TimeTracker>();
+		if(timeTracker==null){
+			GameObject g=GameObject.Find("TimeTracker(Clone)");
+			if(g!=null)
+				timeTracker=g.GetComponent<TimeTracker>();
+		}
 		if(timeTracker==null)
 			return;
 		if(timeTracker.timeleft!=-1){

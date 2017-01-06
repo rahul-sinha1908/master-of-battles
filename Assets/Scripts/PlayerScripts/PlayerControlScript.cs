@@ -66,17 +66,6 @@ public class PlayerControlScript : MonoBehaviour {
 	}
 	private void straightAttack(int x1, int y1, int x2, int y2, PowerStruct p){
 		//TODO Attack Straight Attacks
-		var main=particles.main;
-		var shape=particles.shape;
-		var emission=particles.emission;
-		main.duration=1;
-		main.startSpeed=5;
-		main.loop=false;
-		main.startLifetime=10;
-		shape.enabled=false;
-		emission.enabled=true;
-		Debug.Log("Its Just Before Play");
-		particles.Play();
 
 		//TODO Assign the correct value for substracting the health
 		int val=10;
@@ -87,13 +76,14 @@ public class PlayerControlScript : MonoBehaviour {
 		Vector3 pos1=new Vector3(x2,1, y2)+playerHeight+offset;
 		pos1.x*=GameContants.boxSize;
 		pos1.z*=GameContants.boxSize;
-
+		Vector3 finalPos=pos1;
 		Debug.Log("Shooting from "+pos+" to "+pos1);
 
 		Vector3 dir=pos1-pos;
 		RaycastHit hit;
 		if(Physics.Raycast(pos, dir, out hit , GameContants.boxSize*(GameContants.sizeOfBoardX+GameContants.sizeOfBoardY),attackMask)){
 			GameObject g=hit.collider.gameObject;
+			finalPos=hit.point;
 			Debug.Log("Hit the target : "+g.name);
 			if(g!=null){
 				PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
@@ -101,6 +91,27 @@ public class PlayerControlScript : MonoBehaviour {
 					pl.reduceHealth(val);
 			}
 		}
+
+		transform.LookAt(finalPos);
+		float dist=Vector3.Distance(pos,finalPos);
+		var main=particles.main;
+		var shape=particles.shape;
+		var emission=particles.emission;
+		main.startSpeed=5;
+		main.loop=false;
+		main.startSpeed=10*GameContants.boxSize;
+		main.startLifetime=dist/main.startSpeed.constant;
+		shape.enabled=false;
+		emission.enabled=true;
+		ParticleSystem.Burst[] b=new ParticleSystem.Burst[1];
+		b[0].time=0;
+		b[0].maxCount=100;
+		b[0].minCount=70;
+		emission.SetBursts(b);
+		emission.rateOverTime=30;
+		Debug.Log("Its Just Before Play");
+		particles.Play();
+
 	}
 	public void reduceHealth(int val){
 		Debug.Log("Hit the player : "+transform.name);
