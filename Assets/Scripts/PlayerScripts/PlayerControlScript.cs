@@ -17,7 +17,7 @@ public class PlayerControlScript : MonoBehaviour {
 	private bool isAlive;
 	private MyPlayerScript playerNetScript;
 	private InputManager inputManager;
-
+	private bool isPlayerMoving=false;
 	// Use this for initialization
 	void Start () {
 		initiateMyPlayer();
@@ -131,14 +131,20 @@ public class PlayerControlScript : MonoBehaviour {
 		pos.z*=GameContants.boxSize;
 		Vector3 ipos=transform.position;
 		Vector3 dir =  (pos-ipos);
+		Vector3 td=dir;
 		dir.Normalize();
 		
 		if(GameMethods.sqrDist(ipos,pos)<1.5*1.5){
-			transform.position=new Vector3(pos.x,transform.position.y,pos.z);
+			isPlayerMoving=false;
+			//transform.position=new Vector3(pos.x,transform.position.y,pos.z);
+			controller.Move(td);
 			anim.SetBool("Walk", false);
 			transform.LookAt(new Vector3(transform.position.x,transform.position.y,opponentPost));
 		}else{
-			controller.Move(dir*10*Time.deltaTime);
+			//TODO Specify Player Speed here
+			isPlayerMoving=true;
+			//controller.Move(dir*10*Time.deltaTime);
+			controller.SimpleMove(dir*5);
 			transform.LookAt(pos);
 			anim.SetBool("Walk", true);
 		}
@@ -153,10 +159,7 @@ public class PlayerControlScript : MonoBehaviour {
 	public void setAsSelectedPlayer(){
 		//inputManager.showHealthValue(me.curHealth);
 	}
-	void OnControllerColliderHit(ControllerColliderHit other){
-		//Debug.Log ("Hello : "+other.gameObject.tag);
-		Debug.Log("Other Collider Hit : "+other.collider.name);
-		if(other.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects"))
-			controller.Move(transform.right*Time.deltaTime);
-	}
+	// void OnControllerColliderHit(ControllerColliderHit other){
+			
+	// }
 }
