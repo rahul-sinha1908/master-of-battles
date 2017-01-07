@@ -43,13 +43,19 @@ namespace MasterOfBattles{
 		public static string getPowerDefString(PowerStruct p){
 			//TODO Make the Power From Here
 			string s="";
-
+			s=p.id+"|"+p.strength+"|"+p.otherDef;
 			return s;
 		}
 		public static PowerStruct getPowerStruct(string s){
 			//TODO Retrieve the Power From here
 			PowerStruct p = new PowerStruct();
-			
+			string[] str=s.Split('|');
+			Dev.log(Tag.PlayerAttack,"Toatal Params Got is : "+str.Length);
+			if(str.Length==3){
+				p.id=int.Parse(str[0]);
+				p.strength=int.Parse(str[1]);
+				p.otherDef=str[2];
+			}
 			return p;
 		}
 	}

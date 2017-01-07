@@ -32,15 +32,16 @@ public class PlayerProperties {
 		PlayerPrefs.SetInt(fileName+"Health",healthMetre);
 	}
 	private void LoadInit(){
+		powers=new List<PowerStruct>();
 		if(playerIndex<GameContants.NumberOfPlayer/2){
 			healthMetre=200;
 			speed=1;
+			addPowers(1,15,10);
 		}else{
 			healthMetre=100;
 			speed=2;
+			addPowers(1,20,20);
 		}
-		powers=new List<PowerStruct>();
-		addPowers(1,20,20);
 		playerType=1;
 		loc.x=playerIndex;
 		loc.y=0;

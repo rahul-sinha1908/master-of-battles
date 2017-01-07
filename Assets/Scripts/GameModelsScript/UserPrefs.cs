@@ -18,12 +18,12 @@ namespace MasterOfBattles{
 		private static DevTag instance; 
 		private DevTag(){
 			list =new bool[MAX];
-			list[(int)Tag.CheckBoard]=true;
-			list[(int)Tag.MyPlayerScript]=true;
-			list[(int)Tag.PlayerControlScript]=true;
-			list[(int)Tag.PlayerMove]=true;
+			list[(int)Tag.CheckBoard]=false;
+			list[(int)Tag.MyPlayerScript]=false;
+			list[(int)Tag.PlayerControlScript]=false;
+			list[(int)Tag.PlayerMove]=false;
 			list[(int)Tag.PlayerAttack]=true;
-			list[(int)Tag.PlayerSelect]=true;
+			list[(int)Tag.PlayerSelect]=false;
 			list[(int)Tag.GameMoveListener]=false;
 			list[(int)Tag.UnOrdered]=false;
 			//list[(int)Tag.]=true;

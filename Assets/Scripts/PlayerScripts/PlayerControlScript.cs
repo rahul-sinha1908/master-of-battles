@@ -69,9 +69,6 @@ public class PlayerControlScript : MonoBehaviour {
 	private void straightAttack(int x1, int y1, int x2, int y2, PowerStruct p){
 		//TODO Attack Straight Attacks
 
-		//TODO Assign the correct value for substracting the health
-		int val=10;
-
 		Vector3 pos=GameMethods.getHitVector(x1,y1,1);
 		Vector3 pos1=GameMethods.getHitVector(x2,y2,1);
 		Vector3 finalPos=pos1;
@@ -87,7 +84,7 @@ public class PlayerControlScript : MonoBehaviour {
 				if(g!=null){
 					PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
 					if(pl!=null)
-						pl.reduceHealth(val);
+						pl.reduceHealth(p.strength);
 				}
 			}
 		}

@@ -263,6 +263,8 @@ public class GameMoveListener : MonoBehaviour {
 				Dev.log(Tag.PlayerAttack,"Possible Attack");
 				attackMoveT[selectedPlayerInd].x=(short)p.x;
 				attackMoveT[selectedPlayerInd].y=(short)p.y;
+				attackMoveT[selectedPlayerInd].attackDef=PowersContants.getPowerDefString(getDefaultPower(selectedPlayerInd));
+				Dev.log(Tag.PlayerAttack,"The Attack Definition is :"+attackMoveT[selectedPlayerInd].attackDef);
 				searchPossibleAttacks(selectedPlayerInd);
 			}
 		}
@@ -294,15 +296,31 @@ public class GameMoveListener : MonoBehaviour {
 		if(p.x>=0 && p.x<GameContants.sizeOfBoardX && p.y>=0 && p.y<GameContants.sizeOfBoardY)
 			return true;
 		return false;
-	} 
+	}
+	private PowerStruct getDefaultPower(int ind){
+		//TODO Get the Power that is selected.
+		List<PowerStruct> allPowers = playerProp[ind].powers;
+		int defPower=0;
+		PowerStruct power=allPowers[defPower];
+
+		//Range Should not be changed here.
+		//TODO Take the stored strength and Other Definition for this
+		int strength=power.strength;
+		power.strength=strength;
+		return power;
+	}
+	private void setDefaultPower(int ind, int defP, int strength){
+		//TODO Set the strength for a particular defP for a Particular Player.
+	}
+	private void setDefaultPower(int ind, int defP){
+		//TODO Set default defP for a Particular Player.
+	}
 	private void searchPossibleAttacks(int ind){
 		List<Point> list=new List<Point>();
 		Dev.log(Tag.PlayerAttack,"Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
-		List<PowerStruct> allPowers = playerProp[ind].powers;
-		//TODO Do the Segment to change the default Power.
-		int defaultPower=0;
-		int range = allPowers[defaultPower].range;
-		int strength = allPowers[defaultPower].strength;
+		
+		PowerStruct power=getDefaultPower(ind);
+		int range = power.range;
 		int x=players[ind].x,y=players[ind].y;
 		for(int i=0;i<GameContants.sizeOfBoardX;i++){
 			Point p=new Point();
@@ -464,7 +482,6 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		for(int i=0;i<attackMoveT.Length;i++){
 			if(attackMoveT[i].x!=-1 && attackMoveT[i].y!=-1){
-				attackMoveT[i].attackDef="1|20|20";
 				moves.Add(attackMoveT[i]);
 				attackMoveT[i].x=-1;
 				attackMoveT[i].y=-1;
