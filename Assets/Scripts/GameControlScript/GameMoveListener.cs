@@ -221,44 +221,7 @@ public class GameMoveListener : MonoBehaviour {
 						selectAndSearch(p,move);
 					}
 				}else{
-					if(!isAttack){
-						int s=selectedPlayerInd;
-						if(s<0)
-							return;
-						//TODO Instead of using 1 constant use the player properties to get the max moves.
-						if(applyeRestrictions && (Math.Abs(p.x-backUpMoves[s].x)>1 || Math.Abs(p.y-backUpMoves[s].y)>1))
-							return;
-						else if(!applyeRestrictions){
-							//DONE Give the condition for restricting too much of move
-							int bot=0, top=3;
-							if(!isServer){
-								top=GameContants.sizeOfBoardY;
-								bot=top-3;
-							}
-							if(p.y<bot || p.y>=top)
-								return;
-						}
-						
-						TypeO type=myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y];
-						Dev.log(Tag.CheckBoard, "1 : "+type );
-						myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y]=TypeO.None;
-						myBoard[p.x,p.y]=type;
-						Dev.log(Tag.CheckBoard, "2 : "+myBoard[p.x,p.y]);
-						players[selectedPlayerInd].x=(short)p.x;
-						players[selectedPlayerInd].y=(short)p.y;
-						attackMoveT[selectedPlayerInd].x=-1;
-						attackMoveT[selectedPlayerInd].y=-1;
-					}else{
-						p.x=boxX;
-						p.y=boxY;
-						if(isPossibleMove(p)){
-							Dev.log(Tag.PlayerAttack,"Possible Attack");
-							attackMoveT[selectedPlayerInd].x=(short)p.x;
-							attackMoveT[selectedPlayerInd].y=(short)p.y;
-							searchPossibleAttacks(selectedPlayerInd);
-						}
-					}
-					//selectPlayer=true;
+					onPLayerMoveOrAttack(p);
 				}
 			}else if(hit.collider.gameObject.layer==LayerMask.NameToLayer("PlayerObjects")){
 				string name = hit.collider.gameObject.name;
@@ -271,6 +234,49 @@ public class GameMoveListener : MonoBehaviour {
 				selectAndSearch(p,move);
 			}
 		}
+	}
+	private void onPLayerMoveOrAttack(Point p){
+		if(selectedPlayerInd<0 || selectedPlayerInd>players.Length)
+			return;
+		if(!isAttack){//Move Sequence
+			int s=selectedPlayerInd;
+
+			//TODO Instead of using 1 constant use the player properties to get the max moves.
+			if(applyeRestrictions && (Math.Abs(p.x-backUpMoves[s].x)>1 || Math.Abs(p.y-backUpMoves[s].y)>1))
+				return;
+			else if(!applyeRestrictions){
+				//DONE Give the condition for restricting too much of move
+				int bot=0, top=3;
+				if(!isServer){
+					top=GameContants.sizeOfBoardY;
+					bot=top-3;
+				}
+				if(p.y<bot || p.y>=top)
+					return;
+			}
+			
+			TypeO type=myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y];
+			Dev.log(Tag.CheckBoard, "1 : "+type );
+			myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y]=TypeO.None;
+			myBoard[p.x,p.y]=type;
+			Dev.log(Tag.CheckBoard, "2 : "+myBoard[p.x,p.y]);
+			players[selectedPlayerInd].x=(short)p.x;
+			players[selectedPlayerInd].y=(short)p.y;
+			attackMoveT[selectedPlayerInd].x=-1;
+			attackMoveT[selectedPlayerInd].y=-1;
+
+		}else{//Attack Sequence
+
+			p.x=boxX;
+			p.y=boxY;
+			if(isPossibleMove(p)){
+				Dev.log(Tag.PlayerAttack,"Possible Attack");
+				attackMoveT[selectedPlayerInd].x=(short)p.x;
+				attackMoveT[selectedPlayerInd].y=(short)p.y;
+				searchPossibleAttacks(selectedPlayerInd);
+			}
+		}
+		//selectPlayer=true;
 	}
 	private void selectAndSearch(Point p, bool move){
 		if(!move && !compareTwoPlayerDetails(players[selectedPlayerInd], backUpMoves[selectedPlayerInd])){
