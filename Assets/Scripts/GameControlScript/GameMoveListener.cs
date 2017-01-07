@@ -515,4 +515,10 @@ public class GameMoveListener : MonoBehaviour {
 		}
 
 	}
+	public void deselectAllPlayers(){
+		Dev.log(Tag.PlayerSelect,"Disselecting All the Players");
+		selectedPlayerInd=-1;
+		List<Point> p=new List<Point>();
+		selectScript.showSelectedTiles(p,BoardConstants.Select);
+	}
 }

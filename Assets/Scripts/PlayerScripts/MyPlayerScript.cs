@@ -226,6 +226,8 @@ public class MyPlayerScript : NetworkBehaviour {
 //Remote Calls Till Here
 	private void doAllThresholdMoves(Moves[] moves){
 		//TODO Complete the threshold Move
+		if(otherPlayerScript!=null)
+			otherPlayerScript.gameMoveListener.deselectAllPlayers();
 		attackMoves.Clear();
 		for(int i=0;i<moves.Length;i++){
 			Dev.log(Tag.PlayerMove,"ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);

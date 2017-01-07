@@ -24,7 +24,7 @@ namespace MasterOfBattles{
 			list[(int)Tag.PlayerMove]=true;
 			list[(int)Tag.PlayerAttack]=true;
 			list[(int)Tag.PlayerSelect]=true;
-			list[(int)Tag.GameMoveListener]=true;
+			list[(int)Tag.GameMoveListener]=false;
 			list[(int)Tag.UnOrdered]=false;
 			//list[(int)Tag.]=true;
 		}
