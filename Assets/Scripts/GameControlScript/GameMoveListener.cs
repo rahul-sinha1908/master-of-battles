@@ -223,6 +223,8 @@ public class GameMoveListener : MonoBehaviour {
 				}else{
 					if(!isAttack){
 						int s=selectedPlayerInd;
+						if(s<0)
+							return;
 						//TODO Instead of using 1 constant use the player properties to get the max moves.
 						if(applyeRestrictions && (Math.Abs(p.x-backUpMoves[s].x)>1 || Math.Abs(p.y-backUpMoves[s].y)>1))
 							return;
