@@ -215,8 +215,8 @@ public class GameMoveListener : MonoBehaviour {
 					selectedPlayerInd=k;
 					if(selectedPlayerInd>=0){
 						if(applyeRestrictions){
-							p.x=backUpMoves[k].x;
-							p.y=backUpMoves[k].y;
+							// p.x=backUpMoves[k].x;
+							// p.y=backUpMoves[k].y;
 						}
 						selectAndSearch(p,move);
 					}
@@ -228,8 +228,8 @@ public class GameMoveListener : MonoBehaviour {
 				int k=name.LastIndexOf('m')+1;
 				int ind= Int32.Parse(name.Substring(k));
 				Dev.log(Tag.PlayerSelect,"Selected Player : "+ind);
-				p.x=backUpMoves[ind].x;
-				p.y=backUpMoves[ind].y;
+				// p.x=backUpMoves[ind].x;
+				// p.y=backUpMoves[ind].y;
 				selectedPlayerInd=ind;
 				selectAndSearch(p,move);
 			}
@@ -242,18 +242,8 @@ public class GameMoveListener : MonoBehaviour {
 			int s=selectedPlayerInd;
 
 			//TODO Instead of using 1 constant use the player properties to get the max moves.
-			if(applyeRestrictions && (Math.Abs(p.x-backUpMoves[s].x)>1 || Math.Abs(p.y-backUpMoves[s].y)>1))
+			if(!isPossibleMove(p))
 				return;
-			else if(!applyeRestrictions){
-				//DONE Give the condition for restricting too much of move
-				int bot=0, top=3;
-				if(!isServer){
-					top=GameContants.sizeOfBoardY;
-					bot=top-3;
-				}
-				if(p.y<bot || p.y>=top)
-					return;
-			}
 			
 			TypeO type=myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y];
 			Dev.log(Tag.CheckBoard, "1 : "+type );
@@ -308,24 +298,29 @@ public class GameMoveListener : MonoBehaviour {
 	private void searchPossibleAttacks(int ind){
 		List<Point> list=new List<Point>();
 		Dev.log(Tag.PlayerAttack,"Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
+		List<PowerStruct> allPowers = playerProp[ind].powers;
+		//TODO Do the Segment to change the default Power.
+		int defaultPower=0;
+		int range = allPowers[defaultPower].range;
+		int strength = allPowers[defaultPower].strength;
+		int x=players[ind].x,y=players[ind].y;
 		for(int i=0;i<GameContants.sizeOfBoardX;i++){
 			Point p=new Point();
 			p.x=i;
 			p.y=players[ind].y;
 			if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
 				selectScript.showSelectedTiles(p,BoardConstants.Select);
-			else
-				list.Add(p);
+			else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+				list.Add(p);				
 			p=new Point();
 			p.y=i;
 			p.x=players[ind].x;
 			if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
 				selectScript.showSelectedTiles(p,BoardConstants.Select);
-			else
+			else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
 				list.Add(p);
 		}
-		//TODO Do Somethins for diagonal Points
-		int x=players[ind].x,y=players[ind].y;
+		//TODO Do Somethings for diagonal Points
 		for(int i=0;;i++){
 			bool b=false;
 			Point p=new Point();
@@ -335,7 +330,7 @@ public class GameMoveListener : MonoBehaviour {
 				b=true;
 				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
 					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else
+				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
 					list.Add(p);
 			}
 			p=new Point();
@@ -345,7 +340,7 @@ public class GameMoveListener : MonoBehaviour {
 				b=true;
 				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
 					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else
+				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
 					list.Add(p);
 			}
 			p=new Point();
@@ -355,7 +350,7 @@ public class GameMoveListener : MonoBehaviour {
 				b=true;
 				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
 					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else
+				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
 					list.Add(p);
 			}
 			p=new Point();
@@ -365,7 +360,7 @@ public class GameMoveListener : MonoBehaviour {
 				b=true;
 				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
 					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else
+				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
 					list.Add(p);
 			}
 			if(b==false)

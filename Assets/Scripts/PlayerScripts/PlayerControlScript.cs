@@ -10,10 +10,11 @@ public class PlayerControlScript : MonoBehaviour {
 	private bool isServer, isLocalPlayer;
 	private CharacterController controller;
 	private Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
-	private Vector3 playerHeight=new Vector3(0,0,0);
+	private float playerHeight=0;
 	private float opponentPost;
 	private Camera cam;
 	private PlayerProperties me;
+	private PlayerDetails playerDet;
 	private bool isAlive;
 	private MyPlayerScript playerNetScript;
 	private InputManager inputManager;
@@ -41,7 +42,7 @@ public class PlayerControlScript : MonoBehaviour {
 		
 	}
 
-	public void initializePlayer(bool server, bool local, PlayerProperties player, MyPlayerScript playNet){
+	public void initializePlayer(bool server, bool local, PlayerProperties player, MyPlayerScript playNet, PlayerDetails p){
 		//TODO Put this segment while creating players
 		isServer=server;
 		isLocalPlayer=local;
@@ -49,10 +50,11 @@ public class PlayerControlScript : MonoBehaviour {
 		if((isServer && !isLocalPlayer) || (!isServer && isLocalPlayer))
 			opponentPost=opponentPost*-1;
 		me=player;
+		playerDet=p;
 		playerNetScript=playNet;
 	}
-	public void initializePlayer(bool server, bool local, MyPlayerScript playNet){
-		initializePlayer(server, local, null, playNet);
+	public void initializePlayer(bool server, bool local, MyPlayerScript playNet, PlayerDetails p){
+		initializePlayer(server, local, null, playNet,p);
 	}
 
 	public void doAttack(int x1, int y1, int x2, int y2, PowerStruct p){
@@ -70,12 +72,8 @@ public class PlayerControlScript : MonoBehaviour {
 		//TODO Assign the correct value for substracting the health
 		int val=10;
 
-		Vector3 pos=new Vector3(x1,1, y1)+playerHeight+offset;
-		pos.x*=GameContants.boxSize;
-		pos.z*=GameContants.boxSize;
-		Vector3 pos1=new Vector3(x2,1, y2)+playerHeight+offset;
-		pos1.x*=GameContants.boxSize;
-		pos1.z*=GameContants.boxSize;
+		Vector3 pos=GameMethods.getHitVector(x1,y1,1);
+		Vector3 pos1=GameMethods.getHitVector(x2,y2,1);
 		Vector3 finalPos=pos1;
 		Dev.log(Tag.PlayerControlScript,"Shooting from "+pos+" to "+pos1);
 
@@ -83,12 +81,14 @@ public class PlayerControlScript : MonoBehaviour {
 		RaycastHit hit;
 		if(Physics.Raycast(pos, dir, out hit , GameContants.boxSize*(GameContants.sizeOfBoardX+GameContants.sizeOfBoardY),attackMask)){
 			GameObject g=hit.collider.gameObject;
-			finalPos=hit.point;
-			Dev.log(Tag.PlayerControlScript,"Hit the target : "+g.name);
-			if(g!=null){
-				PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
-				if(pl!=null)
-					pl.reduceHealth(val);
+			if(GameMethods.sqrDist(pos,pos1)+GameContants.boxSize/2.0f>GameMethods.sqrDist(pos,hit.point)){
+				finalPos=hit.point;
+				Dev.log(Tag.PlayerControlScript,"Hit the target : "+g.name);
+				if(g!=null){
+					PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
+					if(pl!=null)
+						pl.reduceHealth(val);
+				}
 			}
 		}
 
@@ -131,15 +131,13 @@ public class PlayerControlScript : MonoBehaviour {
 	}
 	public void movePlayer(PlayerDetails p){
 		//DONE Do animation and stuffs
-		
+		playerDet=p;
 		if(isVisibleToCam()){
 			movePlayerWithoutAnim(p);
 			return;
 		}
 
-		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
-		pos.x*=GameContants.boxSize;
-		pos.z*=GameContants.boxSize;
+		Vector3 pos=GameMethods.getHitVector(p.x,p.y,playerHeight);
 		Vector3 ipos=transform.position;
 		Vector3 dir =  (pos-ipos);
 		Vector3 td=dir;

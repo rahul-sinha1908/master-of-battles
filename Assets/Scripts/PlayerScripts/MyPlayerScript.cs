@@ -15,7 +15,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	public Camera cam;
 	private GameMoveListener gameMoveListener;
 	private Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
-	private Vector3 playerHeight=new Vector3(0,0,0);
+	private float playerHeight=0;
 	private Vector3 opponentPost=new Vector3(0,0,GameContants.sizeOfBoardY*GameContants.boxSize);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
@@ -32,7 +32,6 @@ public class MyPlayerScript : NetworkBehaviour {
 		
 		if(!isServer)
 			opponentPost=opponentPost*-1;
-		opponentPost=opponentPost+playerHeight;	
 		if(isServer && isLocalPlayer){
 			transform.name="ServerPlayer";
 		}else if(isServer && !isLocalPlayer){
@@ -95,9 +94,8 @@ public class MyPlayerScript : NetworkBehaviour {
 		for(int i=0;i<players.Length;i++){
 			//TODO Take the prefab dynamic from Resource Folder according to players[i].playerType
 			//prefab=Resources.Load("path of file");
-			Vector3 creationPoint=new Vector3(players[i].x,0,players[i].y)+offset+playerHeight;
-			creationPoint.x*=GameContants.boxSize;
-			creationPoint.z*=GameContants.boxSize;
+			//Vector3 creationPoint=new Vector3(players[i].x,0,players[i].y)+offset+playerHeight;
+			Vector3 creationPoint=GameMethods.getHitVector(players[i].x,players[i].y,playerHeight);
 			GameObject go = GameObject.Instantiate(prefab,creationPoint,Quaternion.identity);
 			if(isLocalPlayer)
 				go.transform.LookAt(new Vector3(go.transform.position.x,go.transform.position.y,opponentPost.z));
@@ -113,9 +111,9 @@ public class MyPlayerScript : NetworkBehaviour {
 			playerObjects[i]=go;
 			playerControls[i]=go.GetComponent<PlayerControlScript>();
 			if(isLocalPlayer)
-				playerControls[i].initializePlayer(isServer, isLocalPlayer, chess.gameFormation[i], this);
+				playerControls[i].initializePlayer(isServer, isLocalPlayer, chess.gameFormation[i], this, players[i]);
 			else{
-				playerControls[i].initializePlayer(isServer, isLocalPlayer, this);
+				playerControls[i].initializePlayer(isServer, isLocalPlayer, this, players[i]);
 			}
 			if(myTeam){
 				myBoard[players[i].x,players[i].y]=TypeO.MyPlayer;
@@ -258,9 +256,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		}
 	}
 	private bool comparePositions(GameObject g, PlayerDetails p){
-		Vector3 pos=new Vector3(p.x,0, p.y)+playerHeight+offset;
-		pos.x*=GameContants.boxSize;
-		pos.z*=GameContants.boxSize;
+		Vector3 pos=GameMethods.getHitVector(p.x,p.y,playerHeight);
 		if(g.transform.position.x==pos.x && g.transform.position.z==pos.z)
 			return true;
 		return false;
