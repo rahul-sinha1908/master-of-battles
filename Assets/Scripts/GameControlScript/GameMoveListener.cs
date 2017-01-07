@@ -377,6 +377,7 @@ public class GameMoveListener : MonoBehaviour {
 	private void searchPossibleMoves(int ind, bool move, Point pt){
 	//private void searchPossibleMoves(int ind, bool move){
 		isAttack=!move;
+		Point tempThresh=new Point();
 		if(!move){
 			searchPossibleAttacks(ind);
 			return;
@@ -388,18 +389,21 @@ public class GameMoveListener : MonoBehaviour {
 				for(int j=y-1;j<=y+1;j++){
 					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || j>=GameContants.sizeOfBoardY)
 						continue;
-					if((i==x && j==y) || (i==pt.x&& j==pt.y))
-					//if(i==x && j==y)
-						continue;
 					Point p;
 					p.x=i;
 					p.y=j;
+					if((i==x && j==y) || (i==pt.x&& j==pt.y)){
+						tempThresh=p;
+						continue;
+					}
+					
 					list.Add(p);
 				}
 			}
 		}else{
 			x=players[ind].x;
 			y=players[ind].y;
+			//TODO Vary top as needed in the later stage
 			int bot=0, top=3;
 			if(!isServer){
 				top=GameContants.sizeOfBoardY;
@@ -407,18 +411,21 @@ public class GameMoveListener : MonoBehaviour {
 			}
 			for(int i=bot;i<top;i++){
 				for(int j=0;j<GameContants.sizeOfBoardX;j++){
-					if((j==x && i==y) || (j==pt.x && i==pt.y))
-					//if(j==x && i==y)
-						continue;
 					Point p;
 					p.x=j;
 					p.y=i;
+					if((j==x && i==y) || (j==pt.x && i==pt.y)){
+						tempThresh=p;
+						continue;
+					}
+					
 					list.Add(p);
 				}
 			}
 		}
-		listPossibleMoves=list;
 		selectScript.addSelectedTiles(list,BoardConstants.Move);
+		listPossibleMoves=list;
+		listPossibleMoves.Add(tempThresh);
 	}
 	private int checKThePlayerAt(Point p){
 		for(int i=0;i<players.Length;i++){
