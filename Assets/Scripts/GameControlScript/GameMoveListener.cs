@@ -33,6 +33,7 @@ public class GameMoveListener : MonoBehaviour {
 	private float doubleClickTimeLimit=0.3f;
 	private List<Point> listPossibleMoves;
 	private ChessBoardFormation chess;
+	private TypeO[,] myBoard;
 	private List<PlayerProperties> playerProp;
 	private bool isAttack;
 	// Use this for initialization
@@ -45,6 +46,7 @@ public class GameMoveListener : MonoBehaviour {
 
 		powerDatabase=PowersContants.getInstance();
 		chess=ChessBoardFormation.getInstance();
+		myBoard=chess.myBoard;
 		playerProp=chess.gameFormation;
 		initialiseHealtMetre();
 
@@ -57,7 +59,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 	}
 	private void detectZoom(float wheel){
-		Debug.Log("Touch Count : "+Input.touchCount);
+		Dev.log(Tag.GameMoveListener,"Touch Count : "+Input.touchCount);
 
 		float deltaMagnitudeDiff=0f;
 		
@@ -92,14 +94,14 @@ public class GameMoveListener : MonoBehaviour {
 	}
 	private void SingleClick(Vector2 vect)
 	{	
-		Debug.Log("Single Click");
+		Dev.log(Tag.PlayerSelect,"Single Click");
 		Ray ray;
 		ray=Camera.main.ScreenPointToRay(vect);
 		performActionOnHit(ray, true);
 	}
 	private void DoubleClick(Vector2 vect)
 	{
-		Debug.Log("Double Click");
+		Dev.log(Tag.PlayerSelect,"Double Click");
 		Ray ray;
 		ray=Camera.main.ScreenPointToRay(vect);
 		performActionOnHit(ray, false);
@@ -136,7 +138,7 @@ public class GameMoveListener : MonoBehaviour {
 			}
 			else if(Input.GetButtonDown("Fire1"))
 			{
-				//Debug.LogError("It Entered Here3 : "+CrossPlatformInputManager.GetButtonDown("Fire1"));
+				//Dev.error(Tag.UnOrdered,"It Entered Here3 : "+CrossPlatformInputManager.GetButtonDown("Fire1"));
 				if(Vector2.Distance(trackClickVect, Input.mousePosition)<5)
 					DoubleClick(trackClickVect);
 				trackClicks=false;
@@ -168,7 +170,7 @@ public class GameMoveListener : MonoBehaviour {
         }else if (Input.touchCount == 2){
 			detectZoom(0);
         }else if(Input.GetAxis("Mouse ScrollWheel")!=0){
-			Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
+			Dev.log(Tag.GameMoveListener,Input.GetAxis("Mouse ScrollWheel"));
 			detectZoom(Input.GetAxis("Mouse ScrollWheel"));
 		}else if(Input.GetButtonDown("Fire1")){
 			trackDragVect=Input.mousePosition;
@@ -201,7 +203,7 @@ public class GameMoveListener : MonoBehaviour {
 			//DONE Divide this by a constant if you want to increase the area of the play
 			boxX=(int)Mathf.Floor(hit.point.x/GameContants.boxSize)+offsetHitX;
 			boxY=(int)Mathf.Floor(hit.point.z/GameContants.boxSize)+offsetHitY;
-			Debug.Log(hit.point+" : "+boxX+" : "+boxY);
+			Dev.log(Tag.PlayerSelect,hit.point+" : "+boxX+" : "+boxY);
 			Point p;
 			p.x=boxX;
 			p.y=boxY;
@@ -234,6 +236,12 @@ public class GameMoveListener : MonoBehaviour {
 							if(p.y<bot || p.y>=top)
 								return;
 						}
+						
+						TypeO type=myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y];
+						Dev.log(Tag.CheckBoard, "1 : "+type );
+						myBoard[players[selectedPlayerInd].x,players[selectedPlayerInd].y]=TypeO.None;
+						myBoard[p.x,p.y]=type;
+						Dev.log(Tag.CheckBoard, "2 : "+myBoard[p.x,p.y]);
 						players[selectedPlayerInd].x=(short)p.x;
 						players[selectedPlayerInd].y=(short)p.y;
 						attackMoveT[selectedPlayerInd].x=-1;
@@ -242,7 +250,7 @@ public class GameMoveListener : MonoBehaviour {
 						p.x=boxX;
 						p.y=boxY;
 						if(isPossibleMove(p)){
-							Debug.Log("Possible Attack");
+							Dev.log(Tag.PlayerAttack,"Possible Attack");
 							attackMoveT[selectedPlayerInd].x=(short)p.x;
 							attackMoveT[selectedPlayerInd].y=(short)p.y;
 							searchPossibleAttacks(selectedPlayerInd);
@@ -254,7 +262,7 @@ public class GameMoveListener : MonoBehaviour {
 				string name = hit.collider.gameObject.name;
 				int k=name.LastIndexOf('m')+1;
 				int ind= Int32.Parse(name.Substring(k));
-				Debug.Log("Selected Player : "+ind);
+				Dev.log(Tag.PlayerSelect,"Selected Player : "+ind);
 				p.x=backUpMoves[ind].x;
 				p.y=backUpMoves[ind].y;
 				selectedPlayerInd=ind;
@@ -274,6 +282,9 @@ public class GameMoveListener : MonoBehaviour {
 		//searchPossibleMoves(selectedPlayerInd,move);
 	}
 	private bool isPossibleMove(Point p){
+		Dev.log(Tag.CheckBoard,"Is Possible Move 1:"+myBoard[p.x,p.y]);
+		if(myBoard[p.x,p.y]!=TypeO.None)
+			return false;
 		for(int i=0;i<listPossibleMoves.Count;i++){
 			if(p.Equals(listPossibleMoves[i])){
 				return true;
@@ -288,7 +299,7 @@ public class GameMoveListener : MonoBehaviour {
 	} 
 	private void searchPossibleAttacks(int ind){
 		List<Point> list=new List<Point>();
-		Debug.Log("Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
+		Dev.log(Tag.PlayerAttack,"Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
 		for(int i=0;i<GameContants.sizeOfBoardX;i++){
 			Point p=new Point();
 			p.x=i;
@@ -471,7 +482,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 	}
 	public void disableClicksforX(){
-		Debug.Log("DeActivate");
+		Dev.log(Tag.GameMoveListener,"DeActivate");
 		StartCoroutine(stopClicks());
 	}
 	private IEnumerator stopClicks(){
@@ -497,8 +508,10 @@ public class GameMoveListener : MonoBehaviour {
 			p.y-=(int)v.y;
 		}
 		if(isPossibleMove(p)){
+			myBoard[players[i].x,players[i].y]=TypeO.None;
 			players[i].x=(short)p.x;
 			players[i].y=(short)p.y;
+			myBoard[p.x,p.y]=TypeO.MyPlayer;
 		}
 
 	}

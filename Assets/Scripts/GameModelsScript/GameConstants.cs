@@ -6,7 +6,9 @@ namespace MasterOfBattles{
 		public int x;
 		public int y;
 	}
-	
+	public enum TypeO{
+		MyPlayer,OpponentPlayer,Objects,None
+	}
 	public struct PlayerDetails{
 		public short ind,x,y, playerType;
 	}

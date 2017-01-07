@@ -26,7 +26,7 @@ public class PlayerControlScript : MonoBehaviour {
 		particles=transform.FindChild("Particle System").GetComponent<ParticleSystem>();
 		controller=GetComponent<CharacterController>();
 		if(particles==null)
-			Debug.Log("Particle is Null");
+			Dev.log(Tag.UnOrdered,"Particle is Null");
 
 		inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
 		//doAttack(new PowerStruct());
@@ -77,14 +77,14 @@ public class PlayerControlScript : MonoBehaviour {
 		pos1.x*=GameContants.boxSize;
 		pos1.z*=GameContants.boxSize;
 		Vector3 finalPos=pos1;
-		Debug.Log("Shooting from "+pos+" to "+pos1);
+		Dev.log(Tag.PlayerControlScript,"Shooting from "+pos+" to "+pos1);
 
 		Vector3 dir=pos1-pos;
 		RaycastHit hit;
 		if(Physics.Raycast(pos, dir, out hit , GameContants.boxSize*(GameContants.sizeOfBoardX+GameContants.sizeOfBoardY),attackMask)){
 			GameObject g=hit.collider.gameObject;
 			finalPos=hit.point;
-			Debug.Log("Hit the target : "+g.name);
+			Dev.log(Tag.PlayerControlScript,"Hit the target : "+g.name);
 			if(g!=null){
 				PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
 				if(pl!=null)
@@ -109,15 +109,15 @@ public class PlayerControlScript : MonoBehaviour {
 		b[0].minCount=70;
 		emission.SetBursts(b);
 		emission.rateOverTime=30;
-		Debug.Log("Its Just Before Play");
+		Dev.log(Tag.PlayerControlScript,"Its Just Before Play");
 		particles.Play();
 
 	}
 	public void reduceHealth(int val){
-		Debug.Log("Hit the player : "+transform.name);
+		Dev.log(Tag.PlayerControlScript,"Hit the player : "+transform.name);
 		if(isLocalPlayer){
 			me.curHealth-=val;
-			Debug.Log("Cur Health : "+me.curHealth);
+			Dev.log(Tag.PlayerControlScript,"Cur Health : "+me.curHealth);
 			if(me.curHealth<=0){
 				isAlive=false;
 				playerNetScript.killThePlayer(me.playerIndex);
@@ -127,7 +127,7 @@ public class PlayerControlScript : MonoBehaviour {
 	}
 	public void doKillAnimation(){
 		//TODO Do kill Animations
-		Debug.Log("The player Died");
+		Dev.log(Tag.PlayerControlScript,"The player Died");
 	}
 	public void movePlayer(PlayerDetails p){
 		//DONE Do animation and stuffs

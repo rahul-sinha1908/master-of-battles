@@ -6,10 +6,18 @@ public class ChessBoardFormation {
 	
 	public static ChessBoardFormation instance;
 	public List<PlayerProperties> gameFormation;
+
+	public TypeO[,] myBoard;
 	private ChessBoardFormation(){
 		gameFormation=new List<PlayerProperties>();
 		for(int i=0;i<GameContants.NumberOfPlayer;i++){
 			gameFormation.Add(new PlayerProperties(i));
+		}
+		myBoard=new TypeO[GameContants.sizeOfBoardX,GameContants.sizeOfBoardY];
+		for(int i=0;i<GameContants.sizeOfBoardX;i++){
+			for(int j=0;j<GameContants.sizeOfBoardY;j++){
+				myBoard[i,j]=TypeO.None;
+			}
 		}
 	}
 	public static ChessBoardFormation getInstance(){

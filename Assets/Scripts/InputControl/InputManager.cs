@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityStandardAssets.CrossPlatformInput;
+using MasterOfBattles;
 
 public class InputManager: MonoBehaviour{
 	[SerializeField]
@@ -114,7 +115,7 @@ public class InputManager: MonoBehaviour{
 		NetworkManager.singleton.StopClient();
 	}
 	public void sendMoves(){
-		Debug.Log("Sending Moves");
+		Dev.log(Tag.UnOrdered,"Sending Moves");
 		gameMove.disableClicksforX();
 		timeTracker.sendMovesFromTimeTracker();
 		sendButton.SetActive(false);
@@ -139,11 +140,11 @@ public class InputManager: MonoBehaviour{
 		}
 	}
 	public void showHealthValue(int health){
-		//Debug.Log("Its here : "+health);
+		//Dev.log(Tag.UnOrdered,"Its here : "+health);
 		if(healthBarText!=null){
 			string s="Health :"+health;
 			healthBarText.text=s;
 		}else
-			Debug.Log("Its Null");
+			Dev.log(Tag.UnOrdered,"Its Null");
 	}
 }

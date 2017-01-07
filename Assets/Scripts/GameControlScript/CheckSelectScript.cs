@@ -65,11 +65,11 @@ public class CheckSelectScript : MonoBehaviour {
 		triangles[ti + 3] = triangles[ti + 2] = vi + 1;
 		triangles[ti + 4] = triangles[ti + 1] = vi + 2;
 		triangles[ti + 5] = vi + 3;
-		//Debug.Log(vertices.ToArray().Length+" : "+uv.ToArray().Length+" : "+triangles.ToArray().Length);
+		//Dev.log(Tag.UnOrdered,vertices.ToArray().Length+" : "+uv.ToArray().Length+" : "+triangles.ToArray().Length);
 		// for(int i=0;i<vertices.Count;i++)
-		// 	Debug.Log(vertices[i]);
+		// 	Dev.log(Tag.UnOrdered,vertices[i]);
 		// for(int i=0;i<triangles.Count;i++)
-		// 	Debug.Log(triangles[i]);
+		// 	Dev.log(Tag.UnOrdered,triangles[i]);
 	}
 
 	private void refreshMesh(){
@@ -104,7 +104,7 @@ public class CheckSelectScript : MonoBehaviour {
 
 		for(int i=0;i<points.Count;i++){
 			int k=checkExisting(points[i], colorInd);
-			//Debug.Log("K = "+k);
+			//Dev.log(Tag.UnOrdered,"K = "+k);
 			if(k==-1)
 				generateVerticesAndTriangle(points[i].x,points[i].y, colorInd);
 			else{

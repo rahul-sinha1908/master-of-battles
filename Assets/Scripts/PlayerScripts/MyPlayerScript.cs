@@ -23,10 +23,11 @@ public class MyPlayerScript : NetworkBehaviour {
 	private List<Moves> attackMoves;
 	public List<Moves> movesList;
 	public float moveSpeed=15f;
-	ChessBoardFormation chess;
+	private ChessBoardFormation chess;
+	private TypeO[,] myBoard;
 
 	private void Start () {		
-		Debug.Log("My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
+		Dev.log(Tag.UnOrdered,"My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
 		powerDatabase=PowersContants.getInstance();
 		
 		if(!isServer)
@@ -45,7 +46,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		attackMoves=new List<Moves>();
 		movesList=new List<Moves>();
 		if(isServer){
-			Debug.Log("It is Server too ? ");
+			Dev.log(Tag.UnOrdered,"It is Server too ? ");
 			if(isLocalPlayer){
 				timeObject = GameObject.Instantiate(timerPrefab);
 				timeTracker=timeObject.GetComponent<TimeTracker>();
@@ -61,10 +62,11 @@ public class MyPlayerScript : NetworkBehaviour {
 		initLocalVar();
 	}
 	private void initLocalVar(){
+		chess=ChessBoardFormation.getInstance();
+		myBoard=chess.myBoard;
 		if(isLocalPlayer){
 			cam=Camera.main;
 			gameMoveListener=GameObject.Find("CheckBoard").GetComponent<GameMoveListener>();
-			chess=ChessBoardFormation.getInstance();
 			List<Point> onLoc;
 			onLoc=chess.TransFormToGame(!isServer);
 			players=new PlayerDetails[onLoc.Count];
@@ -87,7 +89,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		}
 	}
 	private void createPlayer(bool myTeam){
-		Debug.Log("Toatal Players :"+players.Length);
+		Dev.log(Tag.MyPlayerScript,"Total Players :"+players.Length);
 		playerObjects=new GameObject[players.Length];
 		playerControls=new PlayerControlScript[players.Length];
 		for(int i=0;i<players.Length;i++){
@@ -114,6 +116,11 @@ public class MyPlayerScript : NetworkBehaviour {
 				playerControls[i].initializePlayer(isServer, isLocalPlayer, chess.gameFormation[i], this);
 			else{
 				playerControls[i].initializePlayer(isServer, isLocalPlayer, this);
+			}
+			if(myTeam){
+				myBoard[players[i].x,players[i].y]=TypeO.MyPlayer;
+			}else{
+				myBoard[players[i].x,players[i].y]=TypeO.OpponentPlayer;
 			}
 			//go.layer=LayerMask.GetMask("Hello");
 		}
@@ -145,7 +152,7 @@ public class MyPlayerScript : NetworkBehaviour {
 			return;
 		}
 		for(int i=0;i<moves.Length;i++){
-			Debug.Log("ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
+			Dev.log(Tag.PlayerAttack,"ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
 			if(moves[i].attackDef!=""){
 				attackMoves.Add(moves[i]);
 			}
@@ -169,7 +176,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 	[Command]
 	private void CmdMovePos(Moves[] moves){
-		Debug.Log("Cmd Move Pos : "+moves.Length);
+		Dev.log(Tag.PlayerMove,"Cmd Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 		//CmdreinitCount();
 	}
@@ -177,7 +184,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void CmdInitiatePlayers(PlayerDetails[] players){
 		//DONE Send the initial playerDetails
 		//DONE Send Details back to the Client through the otherPlayer
-		Debug.Log("Cmd Init Got in : "+players.Length);
+		Dev.log(Tag.MyPlayerScript,"Cmd Init Got in : "+players.Length);
 		this.players=players;
 		createPlayer(false);
 		initOtherPlayer();
@@ -189,7 +196,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private void RpcMovePos(Moves[] moves){
 		if(isServer)
 			return;
-		Debug.Log("Rpc Move Pos : "+moves.Length);
+		Dev.log(Tag.PlayerMove,"Rpc Move Pos : "+moves.Length);
 		doAllThresholdMoves(moves);
 		//CmdreinitCount();
 	}
@@ -199,7 +206,7 @@ public class MyPlayerScript : NetworkBehaviour {
 		//DONE Send the initial playerDetails
 		if(isServer)
 			return;
-		Debug.Log("Rpc Initiate Player : "+players.Length);
+		Dev.log(Tag.MyPlayerScript,"Rpc Initiate Player : "+players.Length);
 		this.players=players;
 		createPlayer(false);
 	}
@@ -221,12 +228,12 @@ public class MyPlayerScript : NetworkBehaviour {
 		//TODO Complete the threshold Move
 		attackMoves.Clear();
 		for(int i=0;i<moves.Length;i++){
-			Debug.Log("ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
+			Dev.log(Tag.PlayerMove,"ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
 			if(moves[i].attackDef==""){
-				Debug.Log("Entered Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
+				Dev.log(Tag.PlayerMove,"Entered Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 				players[moves[i].ind].x=moves[i].x;
 				players[moves[i].ind].y=moves[i].y;
-				Debug.Log("Exit Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
+				Dev.log(Tag.PlayerMove,"Exit Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 			}else{
 				attackMoves.Add(moves[i]);
 			}
@@ -266,10 +273,14 @@ public class MyPlayerScript : NetworkBehaviour {
 		}else{
 			CmdKillPlayer((short)i);
 		}
+		myBoard[players[i].x,players[i].y]=TypeO.None;
+		Dev.log(Tag.CheckBoard,"On Killing Local : "+myBoard[players[i].x,players[i].y]);
 		Destroy(playerObjects[i],2f);
 	}
 	private void killFromNetwork(int i){
 		playerControls[i].doKillAnimation();
+		myBoard[players[i].x,players[i].y]=TypeO.None;
+		Dev.log(Tag.CheckBoard,"On Killing Network : "+myBoard[players[i].x,players[i].y]);
 		Destroy(playerObjects[i],2f);
 	}
 	private bool reachedOnce=true;
@@ -288,12 +299,12 @@ public class MyPlayerScript : NetworkBehaviour {
 				}
 			}
 			if(!isLocalPlayer && startAttackSequence && !reachedOnce){
-				Debug.Log("It Entered Here in Update");
+				Dev.log(Tag.MyPlayerScript,"It Entered Here in Update");
 				StartCoroutine(doAttackSequence());
 				if(otherPlayerScript!=null)
 					otherPlayerScript.prepareForAttack();
 				else
-					Debug.Log("Other Player Script Not Found");
+					Dev.log(Tag.MyPlayerScript,"Other Player Script Not Found");
 				reachedOnce=true;
 			}
 		}
@@ -302,7 +313,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private IEnumerator doAttackSequence(){
 		if(attackMoves.Count>0){
 			//TODO Do the attack Sequence
-			Debug.Log("Total Attack Sequence : "+isLocalPlayer+" : "+attackMoves.Count);
+			Dev.log(Tag.PlayerAttack,"Total Attack Sequence : "+isLocalPlayer+" : "+attackMoves.Count);
 			for(int i=0;i<attackMoves.Count;i++){
 				int x1,y1,x2,y2;
 				int ind=attackMoves[i].ind;
@@ -325,7 +336,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	public void prepareForAttack(){
 		//DONE call prepare for next
 		if(isLocalPlayer)
-			Debug.Log("It Came Here prepare for Attack");
+			Dev.log(Tag.PlayerAttack,"It Came Here prepare for Attack");
 		StartCoroutine(doAttackSequence());
 	}
 	public void prepareForNext(){
