@@ -395,11 +395,12 @@ public class GameMoveListener : MonoBehaviour {
 			searchPossibleAttacks(ind);
 			return;
 		}
+		int speed=playerProp[ind].speed;
 		List<Point> list=new List<Point>();
 		int x=backUpMoves[ind].x, y=backUpMoves[ind].y;
 		if(applyeRestrictions){
-			for(int i=x-1;i<=x+1;i++){
-				for(int j=y-1;j<=y+1;j++){
+			for(int i=x-speed;i<=x+speed;i++){
+				for(int j=y-speed;j<=y+speed;j++){
 					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || j>=GameContants.sizeOfBoardY)
 						continue;
 					Point p;
