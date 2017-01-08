@@ -33,16 +33,17 @@ public class PlayerProperties {
 	}
 	private void LoadInit(){
 		powers=new List<PowerStruct>();
-		if(playerIndex<GameContants.NumberOfPlayer/2){
+		if(playerIndex%2==0){
 			healthMetre=200;
 			speed=1;
+			playerType=1;
 			addPowers(1,15,10);
 		}else{
 			healthMetre=100;
 			speed=2;
+			playerType=0;
 			addPowers(1,20,20);
 		}
-		playerType=1;
 		loc.x=playerIndex;
 		loc.y=0;
 	}

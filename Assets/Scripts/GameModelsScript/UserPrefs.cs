@@ -20,7 +20,7 @@ namespace MasterOfBattles{
 			list =new bool[MAX];
 			list[(int)Tag.CheckBoard]=false;
 			list[(int)Tag.MyPlayerScript]=false;
-			list[(int)Tag.PlayerControlScript]=false;
+			list[(int)Tag.PlayerControlScript]=true;
 			list[(int)Tag.PlayerMove]=false;
 			list[(int)Tag.PlayerAttack]=true;
 			list[(int)Tag.PlayerSelect]=false;
@@ -45,7 +45,7 @@ namespace MasterOfBattles{
 			if(DevTag.getInstance().isAllowed(tag))
 				Debug.Log(tag+" : "+s);
 		}
-		public static void error(Tag tag, Object s){
+		public static void error(Tag tag, object s){
 			if(DevTag.getInstance().isAllowed(tag))
 				Debug.LogError(tag+" : "+s);
 		}

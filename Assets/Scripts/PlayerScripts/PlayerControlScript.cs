@@ -23,12 +23,10 @@ public class PlayerControlScript : MonoBehaviour {
 	void Start () {
 		initiateMyPlayer();
 		cam=Camera.main;
-		anim=GetComponent<Animator>();
 		particles=transform.FindChild("Particle System").GetComponent<ParticleSystem>();
 		controller=GetComponent<CharacterController>();
 		if(particles==null)
 			Dev.log(Tag.UnOrdered,"Particle is Null");
-
 		inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
 		//doAttack(new PowerStruct());
 	}
@@ -52,6 +50,14 @@ public class PlayerControlScript : MonoBehaviour {
 		me=player;
 		playerDet=p;
 		playerNetScript=playNet;
+		
+		Object go=Resources.Load("Players/"+GameContants.getInstance().playerNames[me.playerType]);
+		if(go!=null){
+			//Dev.log(Tag.PlayerControlScript,"The object is not null");
+			GameObject g = (GameObject)GameObject.Instantiate(go,transform,false);
+			anim=g.GetComponent<Animator>();
+		}else
+			Dev.log(Tag.PlayerControlScript,"The object is null");
 	}
 	public void initializePlayer(bool server, bool local, MyPlayerScript playNet, PlayerDetails p){
 		initializePlayer(server, local, null, playNet,p);

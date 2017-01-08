@@ -25,6 +25,20 @@ namespace MasterOfBattles{
 		public static int sizeOfBoardY=30;
 		public static int boxSize=3;
 		public static int timeConstant=10;
+		public static GameContants instance;
+
+		public string[] playerNames;
+		private GameContants(){
+			playerNames=new string[10];
+			playerNames[0]="Assassin1";
+			playerNames[1]="SwordSoldier1";
+		}
+
+		public static GameContants getInstance(){
+			if(instance==null)
+				instance=new GameContants();
+			return instance;
+		}
 	}
 	public class BoardConstants{
 		public static int Select=0;
