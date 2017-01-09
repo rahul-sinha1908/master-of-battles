@@ -26,11 +26,27 @@ namespace MasterOfBattles{
 		}
 		private PowerNameId addPower(int i){
 			PowerNameId p=new PowerNameId();
-			if(i==1){
-				p.id=1;
+			p.id=i;
+			if(i==0){
+				p.name="Run into another Player";
+				p.description="If you run into some other player in the same block, your health will be reduced with the health of the other player. And the one whose health is less than the other dies.";
+			}else if(i==1){
 				p.name="Straight Attack";
 				p.description="It Fires a Straight attack";
 				p.explanationLink="https://nolink.com";
+			}else if(i==2){
+				p.name="Range Attacks";
+				p.description = "This attack can be fired in all the direction but it affects only the cell you have aimed this attack for.";
+				p.explanationLink="some link";
+			}else if(i==3){
+				p.name="Ray Spreader";
+				p.description="This attack is almost the same as the straight attacks. The Only difference is when it reaches the destination point without any obstruction it spreads the attack in normal directions.";
+			}else if(i==4){
+				p.name="Bomb Attack";
+				p.description="It affects a range of place where you throw your bomb. However there is a draw back. The range which you select to get affected, it also affects that range in the direction of firing at the firing end.";
+			}else if(i==5){
+				p.name="Triple Shot";
+				p.description="It affects It fires simultaneously in straight and two 45deg Directions over the same distance";
 			}
 			return p;
 		}

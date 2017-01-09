@@ -418,7 +418,7 @@ public class GameMoveListener : MonoBehaviour {
 			x=players[ind].x;
 			y=players[ind].y;
 			//TODO Vary top as needed in the later stage
-			int bot=0, top=3;
+			int bot=0, top=GameContants.sizeOfBoardY/5;
 			if(!isServer){
 				top=GameContants.sizeOfBoardY;
 				bot=top-3;

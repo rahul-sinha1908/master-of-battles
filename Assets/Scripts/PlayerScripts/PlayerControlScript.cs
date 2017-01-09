@@ -4,6 +4,7 @@ using UnityEngine;
 using MasterOfBattles;
 
 public class PlayerControlScript : MonoBehaviour {
+	public Material attack, initialPlace, movedPlace; 
 	public LayerMask attackMask;
 	private Animator anim;
 	private ParticleSystem particles;
@@ -19,11 +20,15 @@ public class PlayerControlScript : MonoBehaviour {
 	private MyPlayerScript playerNetScript;
 	private InputManager inputManager;
 	private bool isPlayerMoving=false;
+	private Transform playerIdentity;
+	private MeshRenderer playerIdentityMesh;
+	private Material[] playerIdentityMat;
 	// Use this for initialization
 	void Start () {
 		initiateMyPlayer();
 		cam=Camera.main;
 		particles=transform.FindChild("Particle System").GetComponent<ParticleSystem>();
+		
 		controller=GetComponent<CharacterController>();
 		if(particles==null)
 			Dev.log(Tag.UnOrdered,"Particle is Null");
@@ -50,11 +55,25 @@ public class PlayerControlScript : MonoBehaviour {
 		me=player;
 		playerDet=p;
 		playerNetScript=playNet;
+
+		playerIdentity=transform.FindChild("PlayerIdentity");
+		if(playerIdentity!=null){
+			playerIdentityMesh=playerIdentity.GetComponent<MeshRenderer>();
+			playerIdentityMat=playerIdentityMesh.materials;
+		}
+
+		if(playerIdentityMat!=null){
+			Dev.log(Tag.PlayerControlScript, playerIdentityMat.Length);
+			if(playerIdentityMat.Length>0)
+				playerIdentityMesh.material=initialPlace;
+		}
+		
 		
 		Object go=Resources.Load("Players/"+GameContants.getInstance().playerNames[me.playerType]);
 		if(go!=null){
 			//Dev.log(Tag.PlayerControlScript,"The object is not null");
 			GameObject g = (GameObject)GameObject.Instantiate(go,transform,false);
+			g.name="Avatar";
 			anim=g.GetComponent<Animator>();
 		}else
 			Dev.log(Tag.PlayerControlScript,"The object is null");

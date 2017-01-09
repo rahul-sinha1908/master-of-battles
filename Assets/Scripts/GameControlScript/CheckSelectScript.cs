@@ -17,7 +17,7 @@ public class CheckSelectScript : MonoBehaviour {
 	private List<Vector2> uv;
 	private List<int> triangles;
 	private Vector3 planeOffset;
-	private Vector3 heightOffset=new Vector3(0,0.11f,0);
+	private Vector3 heightOffset=new Vector3(0,0.01f,0);
 	private void Awake()
 	{
 		GetComponent<MeshFilter>().mesh=mesh=new Mesh();
