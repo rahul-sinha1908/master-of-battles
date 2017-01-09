@@ -424,7 +424,7 @@ public class GameMoveListener : MonoBehaviour {
 			int bot=0, top=GameContants.sizeOfBoardY/5;
 			if(!isServer){
 				top=GameContants.sizeOfBoardY;
-				bot=top-3;
+				bot=top-GameContants.sizeOfBoardY/5;
 			}
 			for(int i=bot;i<top;i++){
 				for(int j=0;j<GameContants.sizeOfBoardX;j++){
@@ -476,6 +476,7 @@ public class GameMoveListener : MonoBehaviour {
 	public void generateMoves(){
 		//DONE Write a script to generate Moves
 		for(int i=0;i<players.Length;i++){
+			playerControls[i].playerIsAtOriginal();
 			if(!compareTwoPlayerDetails(players[i],backUpMoves[i])){
 				Moves m;
 				m.ind=(short)i;
@@ -546,7 +547,6 @@ public class GameMoveListener : MonoBehaviour {
 			myBoard[p.x,p.y]=TypeO.MyPlayer;
 			changePlayerIdentityMaterial(i);
 		}
-
 	}
 	private void changePlayerIdentityMaterial(int i){
 		if(players[i].x==backUpMoves[i].x && players[i].y==backUpMoves[i].y){

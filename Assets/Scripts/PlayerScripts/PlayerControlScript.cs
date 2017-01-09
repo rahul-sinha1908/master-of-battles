@@ -65,12 +65,14 @@ public class PlayerControlScript : MonoBehaviour {
 
 		playerIdentity=transform.FindChild("PlayerIdentity");
 		if(playerIdentity!=null){
+			if(!isLocalPlayer)
+				playerIdentity.Rotate(Vector3.up,180f,Space.Self);
 			playerIdentityMesh=playerIdentity.GetComponent<MeshRenderer>();
-			playerIdentity.FindChild("Text").GetComponent<TextMesh>().text=""+(me.playerIndex+1);
+			playerIdentity.FindChild("Text").GetComponent<TextMesh>().text=""+(p.ind+1);
 			playerIsAtOriginal();
-		}		
+		}
 		
-		Object go=Resources.Load("Players/"+GameContants.getInstance().playerNames[me.playerType]);
+		Object go=Resources.Load("Players/"+GameContants.getInstance().playerNames[p.playerType]);
 		if(go!=null){
 			//Dev.log(Tag.PlayerControlScript,"The object is not null");
 			GameObject g = (GameObject)GameObject.Instantiate(go,transform,false);

@@ -74,7 +74,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				p.ind=(short)i;
 				p.x=(short)onLoc[i].x;
 				p.y=(short)onLoc[i].y;
-				p.playerType=1;
+				p.playerType=(short)chess.gameFormation[i].playerType;
 				players[i]=p;
 			}
 			createPlayer(true);
