@@ -78,7 +78,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				players[i]=p;
 			}
 			createPlayer(true);
-			gameMoveListener.updateCameraPositionAndVariable(isServer,this,timeTracker);
+			gameMoveListener.updateCameraPositionAndVariable(isServer,this,timeTracker, playerControls);
 			if(!isServer){
 				CmdInitiatePlayers(players);
 				// short[] a=new short[1];

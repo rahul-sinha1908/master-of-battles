@@ -22,7 +22,6 @@ public class PlayerControlScript : MonoBehaviour {
 	private bool isPlayerMoving=false;
 	private Transform playerIdentity;
 	private MeshRenderer playerIdentityMesh;
-	private Material[] playerIdentityMat;
 	// Use this for initialization
 	void Start () {
 		initiateMyPlayer();
@@ -44,7 +43,15 @@ public class PlayerControlScript : MonoBehaviour {
 	void Update () {
 		
 	}
-
+	public void playerHasMoved(){
+		playerIdentityMesh.material=movedPlace;
+	}
+	public void playerIsAttacking(){
+		playerIdentityMesh.material=attack;
+	}
+	public void playerIsAtOriginal(){
+		playerIdentityMesh.material=initialPlace;
+	}
 	public void initializePlayer(bool server, bool local, PlayerProperties player, MyPlayerScript playNet, PlayerDetails p){
 		//TODO Put this segment while creating players
 		isServer=server;
@@ -59,16 +66,9 @@ public class PlayerControlScript : MonoBehaviour {
 		playerIdentity=transform.FindChild("PlayerIdentity");
 		if(playerIdentity!=null){
 			playerIdentityMesh=playerIdentity.GetComponent<MeshRenderer>();
-			playerIdentityMat=playerIdentityMesh.materials;
 			playerIdentity.FindChild("Text").GetComponent<TextMesh>().text=""+(me.playerIndex+1);
-		}
-
-		if(playerIdentityMat!=null){
-			Dev.log(Tag.PlayerControlScript, playerIdentityMat.Length);
-			if(playerIdentityMat.Length>0)
-				playerIdentityMesh.material=initialPlace;
-		}
-		
+			playerIsAtOriginal();
+		}		
 		
 		Object go=Resources.Load("Players/"+GameContants.getInstance().playerNames[me.playerType]);
 		if(go!=null){

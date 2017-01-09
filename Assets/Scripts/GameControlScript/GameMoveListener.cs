@@ -16,6 +16,7 @@ public class GameMoveListener : MonoBehaviour {
 	private int boxX,boxY;
 	private MyPlayerScript myPlayerScript;
 	private PlayerDetails[] players, backUpMoves;
+	private PlayerControlScript[] playerControls;
 	private Moves[] attackMoveT;
 	private List<Moves> moves;
 	private float orthoZoomSpeed=0.2f, perspectiveZoomSpeed=0.2f, camPanSpeed=1f, defaultFeildOfView;
@@ -254,6 +255,7 @@ public class GameMoveListener : MonoBehaviour {
 			players[selectedPlayerInd].y=(short)p.y;
 			attackMoveT[selectedPlayerInd].x=-1;
 			attackMoveT[selectedPlayerInd].y=-1;
+			changePlayerIdentityMaterial(selectedPlayerInd);
 
 		}else{//Attack Sequence
 
@@ -266,6 +268,7 @@ public class GameMoveListener : MonoBehaviour {
 				attackMoveT[selectedPlayerInd].attackDef=PowersContants.getPowerDefString(getDefaultPower(selectedPlayerInd));
 				Dev.log(Tag.PlayerAttack,"The Attack Definition is :"+attackMoveT[selectedPlayerInd].attackDef);
 				searchPossibleAttacks(selectedPlayerInd);
+				playerControls[selectedPlayerInd].playerIsAttacking();
 			}
 		}
 		//selectPlayer=true;
@@ -448,7 +451,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		return -1;
 	}
-	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj, TimeTracker track){
+	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj, TimeTracker track, PlayerControlScript[] playerC){
 		this.isServer=isServer;
 		if(!isServer){
 			//TODO change the location of the camera
@@ -457,6 +460,7 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		inputManager.setMyPlayerScript(obj,track,this);
 		myPlayerScript=obj;
+		playerControls=playerC;
 		players=myPlayerScript.getPlayerDetails();
 		moves=myPlayerScript.movesList;
 		backUpMoves=new PlayerDetails[players.Length];
@@ -540,8 +544,16 @@ public class GameMoveListener : MonoBehaviour {
 			players[i].x=(short)p.x;
 			players[i].y=(short)p.y;
 			myBoard[p.x,p.y]=TypeO.MyPlayer;
+			changePlayerIdentityMaterial(i);
 		}
 
+	}
+	private void changePlayerIdentityMaterial(int i){
+		if(players[i].x==backUpMoves[i].x && players[i].y==backUpMoves[i].y){
+			playerControls[i].playerIsAtOriginal();
+		}else{
+			playerControls[i].playerHasMoved();
+		}
 	}
 	public void deselectAllPlayers(){
 		Dev.log(Tag.PlayerSelect,"Disselecting All the Players");
