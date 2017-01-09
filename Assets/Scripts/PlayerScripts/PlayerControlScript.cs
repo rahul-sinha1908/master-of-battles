@@ -60,6 +60,7 @@ public class PlayerControlScript : MonoBehaviour {
 		if(playerIdentity!=null){
 			playerIdentityMesh=playerIdentity.GetComponent<MeshRenderer>();
 			playerIdentityMat=playerIdentityMesh.materials;
+			playerIdentity.FindChild("Text").GetComponent<TextMesh>().text=""+(me.playerIndex+1);
 		}
 
 		if(playerIdentityMat!=null){
