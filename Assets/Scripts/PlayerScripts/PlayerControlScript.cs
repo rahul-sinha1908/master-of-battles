@@ -53,7 +53,7 @@ public class PlayerControlScript : MonoBehaviour {
 		playerIdentityMesh.material=initialPlace;
 	}
 	public void initializePlayer(bool server, bool local, PlayerProperties player, MyPlayerScript playNet, PlayerDetails p){
-		//TODO Put this segment while creating players
+		//DONE Put this segment while creating players
 		isServer=server;
 		isLocalPlayer=local;
 		opponentPost=GameContants.sizeOfBoardY*GameContants.boxSize;

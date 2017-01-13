@@ -28,6 +28,12 @@ public class MyPlayerScript : NetworkBehaviour {
 
 	private void Start () {		
 		Dev.log(Tag.UnOrdered,"My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
+
+		if(isLocalPlayer)
+			GameRunningConstants.getInstance().localPlayerScript=this;
+		else
+			GameRunningConstants.getInstance().networkPlayerScript=this;
+
 		powerDatabase=PowersContants.getInstance();
 		
 		if(!isServer)

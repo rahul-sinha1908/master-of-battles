@@ -37,8 +37,10 @@ public class GameMoveListener : MonoBehaviour {
 	private TypeO[,] myBoard;
 	private List<PlayerProperties> playerProp;
 	private bool isAttack;
+	private GameRunningConstants grc;
 	// Use this for initialization
 	void Start () {
+		GameRunningConstants.getInstance().gameMoveListener=this;
 		cam = Camera.main;
 		defaultCamVector=cam.transform.position;
 		defaultFeildOfView=cam.fieldOfView;
@@ -50,6 +52,7 @@ public class GameMoveListener : MonoBehaviour {
 		myBoard=chess.myBoard;
 		playerProp=chess.gameFormation;
 		initialiseHealtMetre();
+		grc=GameRunningConstants.getInstance();
 
 		trackClicks=false;
 		isClicksActive=true;
@@ -163,6 +166,7 @@ public class GameMoveListener : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
+		applyeRestrictions=true;
 		checkClickListener();
 		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
@@ -322,6 +326,11 @@ public class GameMoveListener : MonoBehaviour {
 		List<Point> list=new List<Point>();
 		Dev.log(Tag.PlayerAttack,"Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
 		
+		if(grc.weaponControlScript!=null)
+			grc.weaponControlScript.callToAddWeapon(playerProp[ind]);
+		else
+			Dev.log(Tag.PlayerAttack,"WeaponCS is not Initialised");
+
 		PowerStruct power=getDefaultPower(ind);
 		int range = power.range;
 		int x=players[ind].x,y=players[ind].y;

@@ -9,6 +9,9 @@ namespace MasterOfBattles{
 	public enum TypeO{
 		MyPlayer,OpponentPlayer,Objects,None
 	}
+	public enum ErrorType{
+		OutOfPlace, OutOfRange, DoubleTapToAttack, SingleTapTOSelectAndMove
+	}
 	public struct PlayerDetails{
 		public short ind,x,y, playerType;
 	}

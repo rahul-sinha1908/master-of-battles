@@ -84,11 +84,11 @@ public class TimeTracker : NetworkBehaviour {
 				dataSend=true;
 			}
 			else{
-				//TODO Show the Canvas with time Left Bar and a cancel button too
+				//DONE Show the Canvas with time Left Bar and a cancel button too
 			}
 		}else{
 			dataSend=false;
-			//TODO Remove the time canvas and cancel button. Add the Accept Button
+			//DONE Remove the time canvas and cancel button. Add the Accept Button
 		}
 	}
 	public void clickedOnCancel(){
@@ -104,7 +104,7 @@ public class TimeTracker : NetworkBehaviour {
 			playerCountDownServer=true;
 	}
 	public void sendMovesFromTimeTracker(){
-		//TODO Send Moves From TimeTracker on Click Of the Button
+		//DONE Send Moves From TimeTracker on Click Of the Button
 		if(!isServer)
 			clientPlayerScript.changeClientCountDown(true);
 		else

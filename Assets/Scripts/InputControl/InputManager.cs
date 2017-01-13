@@ -27,6 +27,8 @@ public class InputManager: MonoBehaviour{
 	private GameMoveListener gameMove;
 	void Start()
 	{
+		GameRunningConstants.getInstance().inputManager=this;
+		
 		OtherPlatform.SetActive(true);
 		if(Application.isMobilePlatform){
 			MobilePlatform.SetActive(true);
