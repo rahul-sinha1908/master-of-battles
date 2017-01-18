@@ -11,9 +11,11 @@ namespace MasterOfBattles{
 		public DisplayInformation displayInformation;
 		public MyPlayerScript localPlayerScript, networkPlayerScript;
 		public GameMoveListener gameMoveListener;
+		public WeaponAssignmentScript weaponAssignmentScript;
+		public bool disableClicks;
 
 		private GameRunningConstants(){
-			
+			disableClicks=true;
 		}
 
 		public static GameRunningConstants getInstance(){

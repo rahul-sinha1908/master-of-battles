@@ -7,6 +7,7 @@ using MasterOfBattles;
 public class DisplayInformation : MonoBehaviour {
 	public GameObject canvas;
 	public Text text;
+	private float displayTime;
 
 	void Start () {
 		GameRunningConstants.getInstance().displayInformation=this;
@@ -22,13 +23,13 @@ public class DisplayInformation : MonoBehaviour {
 		/*else if(err==ErrorType.){
 			text.text="";
 		}*/
-
+		yield return new WaitForSeconds(displayTime);
 		canvas.SetActive(false);
 		yield break;
 	}
 	public void displayInformation(ErrorType err){
 		StartCoroutine(displayInfo(err));
-	} 
+	}
 	void Update () {
 		
 	}

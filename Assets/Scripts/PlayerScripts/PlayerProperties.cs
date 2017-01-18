@@ -38,6 +38,7 @@ public class PlayerProperties {
 			speed=1;
 			playerType=1;
 			addPowers(1,15,10);
+			addPowers(2,15,10);
 		}else{
 			healthMetre=100;
 			speed=2;

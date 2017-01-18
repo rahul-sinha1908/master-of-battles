@@ -47,5 +47,5 @@ namespace MasterOfBattles{
 		public static int Select=0;
 		public static int Move=1;
 		public static int Attack=2;
-	} 
+	}
 }

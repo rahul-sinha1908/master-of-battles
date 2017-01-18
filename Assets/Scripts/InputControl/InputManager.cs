@@ -27,7 +27,11 @@ public class InputManager: MonoBehaviour{
 	private GameMoveListener gameMove;
 	void Start()
 	{
+		Dev.log(Tag.WeaponAssignmentScript, "Input Manager is initialised");
 		GameRunningConstants.getInstance().inputManager=this;
+		GameRunningConstants.getInstance().weaponAssignmentScript.gameObject.SetActive(false);
+		GameRunningConstants.getInstance().localPlayerScript.initLocalVar();
+		GameRunningConstants.getInstance().disableClicks=false;
 		
 		OtherPlatform.SetActive(true);
 		if(Application.isMobilePlatform){
@@ -126,7 +130,6 @@ public class InputManager: MonoBehaviour{
 		for(int i=0;i<2;i++){
 			yield return new WaitForEndOfFrame();
 		}
-
 	}
 	public void setMyPlayerScript(MyPlayerScript myPlayer, TimeTracker track, GameMoveListener moveList){
 		this.myPlayer=myPlayer;

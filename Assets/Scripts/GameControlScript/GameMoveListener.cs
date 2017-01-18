@@ -45,7 +45,6 @@ public class GameMoveListener : MonoBehaviour {
 		defaultCamVector=cam.transform.position;
 		defaultFeildOfView=cam.fieldOfView;
 
-		inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
 
 		powerDatabase=PowersContants.getInstance();
 		chess=ChessBoardFormation.getInstance();
@@ -166,27 +165,36 @@ public class GameMoveListener : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
-		applyeRestrictions=true;
+		// applyeRestrictions=true;
+		// if(applyeRestrictions)
+		// 	return;
+		if(grc.disableClicks)
+			return;
+		
 		checkClickListener();
-		if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
-			Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
-			touchDeltaPosition=touchDeltaPosition*PlayerPrefs.GetFloat(UserPrefs.mobPanSensitivity, 0.2f);
-			Pan(touchDeltaPosition);
-        }else if (Input.touchCount == 2){
-			detectZoom(0);
-        }else if(Input.GetAxis("Mouse ScrollWheel")!=0){
-			Dev.log(Tag.GameMoveListener,Input.GetAxis("Mouse ScrollWheel"));
-			detectZoom(Input.GetAxis("Mouse ScrollWheel"));
-		}else if(Input.GetButtonDown("Fire1")){
-			trackDragVect=Input.mousePosition;
-		}else if(Input.GetButton("Fire1")){
-			if(Input.mousePosition!=trackDragVect){
-				Vector2 delta=Input.mousePosition-trackDragVect;
-				trackDragVect=Input.mousePosition;
-				delta = delta * PlayerPrefs.GetFloat(UserPrefs.moveSensitivity, 0.2f);
-				Pan(delta);
+		if(Application.isMobilePlatform){
+			if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
+				Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
+				touchDeltaPosition=touchDeltaPosition*PlayerPrefs.GetFloat(UserPrefs.mobPanSensitivity, 0.2f);
+				Pan(touchDeltaPosition);
+			}else if (Input.touchCount == 2){
+				detectZoom(0);
 			}
-			
+		}else{ 
+			if(Input.GetAxis("Mouse ScrollWheel")!=0){
+				Dev.log(Tag.GameMoveListener,Input.GetAxis("Mouse ScrollWheel"));
+				detectZoom(Input.GetAxis("Mouse ScrollWheel"));
+			}else if(Input.GetButtonDown("Fire1")){
+				trackDragVect=Input.mousePosition;
+			}else if(Input.GetButton("Fire1")){
+				if(Input.mousePosition!=trackDragVect){
+					Vector2 delta=Input.mousePosition-trackDragVect;
+					trackDragVect=Input.mousePosition;
+					delta = delta * PlayerPrefs.GetFloat(UserPrefs.moveSensitivity, 0.2f);
+					Pan(delta);
+				}
+				
+			}
 		}
 		if(selectedPlayerInd!=-1){
 			inputManager.showHealthValue(playerProp[selectedPlayerInd].curHealth);
@@ -404,9 +412,11 @@ public class GameMoveListener : MonoBehaviour {
 		isAttack=!move;
 		Point tempThresh=new Point();
 		if(!move){
+			grc.weaponControlScript.showWeapons();
 			searchPossibleAttacks(ind);
 			return;
 		}
+		grc.weaponControlScript.hideWeapons();
 		int speed=playerProp[ind].speed;
 		List<Point> list=new List<Point>();
 		int x=backUpMoves[ind].x, y=backUpMoves[ind].y;
@@ -467,6 +477,8 @@ public class GameMoveListener : MonoBehaviour {
 			cam.transform.position=cam.transform.position-2*(new Vector3(0,0,cam.transform.position.z));
 			cam.transform.LookAt(transform.position);
 		}
+		if(inputManager==null)
+			inputManager=GameRunningConstants.getInstance().inputManager;
 		inputManager.setMyPlayerScript(obj,track,this);
 		myPlayerScript=obj;
 		playerControls=playerC;

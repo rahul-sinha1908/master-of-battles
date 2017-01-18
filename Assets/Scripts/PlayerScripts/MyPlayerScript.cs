@@ -26,7 +26,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	private ChessBoardFormation chess;
 	private TypeO[,] myBoard;
 
-	private void Start () {		
+	private void Start () {
 		Dev.log(Tag.UnOrdered,"My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
 
 		if(isLocalPlayer)
@@ -64,9 +64,9 @@ public class MyPlayerScript : NetworkBehaviour {
 			}
 			//TODO Fix th authority problem.
 		}
-		initLocalVar();
+		//initLocalVar();
 	}
-	private void initLocalVar(){
+	public void initLocalVar(){
 		chess=ChessBoardFormation.getInstance();
 		myBoard=chess.myBoard;
 		if(isLocalPlayer){

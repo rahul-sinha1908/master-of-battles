@@ -19,7 +19,7 @@ namespace MasterOfBattles{
 		public static Vector3 getHitVector(Point p, float height=0){
 			Vector3 pos=new Vector3(p.x,height, p.y)+offset;
 			pos.x*=GameContants.boxSize;
-			pos.z*=GameContants.boxSize;	
+			pos.z*=GameContants.boxSize;
 			return pos;
 		}
 		public static Vector3 getHitVector(int x, int y, float height=0){

@@ -15,12 +15,12 @@ namespace MasterOfBattles{
 
 	public class PowersContants{
 		static PowersContants instance;
-		List<PowerNameId> powers;
-		int total=1;
+		public List<PowerNameId> powers;
+		int total=5;
 		//public static PowerNameId
 		private PowersContants(){
 			powers=new List<PowerNameId>();
-			for(int i=1;i<=total;i++){
+			for(int i=0;i<=total;i++){
 				powers.Add(addPower(i));
 			}
 		}
