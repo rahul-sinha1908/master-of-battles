@@ -180,7 +180,7 @@ public class GameMoveListener : MonoBehaviour {
 			}else if (Input.touchCount == 2){
 				detectZoom(0);
 			}
-		}else{ 
+		}else{
 			if(Input.GetAxis("Mouse ScrollWheel")!=0){
 				Dev.log(Tag.GameMoveListener,Input.GetAxis("Mouse ScrollWheel"));
 				detectZoom(Input.GetAxis("Mouse ScrollWheel"));

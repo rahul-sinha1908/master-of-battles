@@ -6,14 +6,16 @@ using MasterOfBattles;
 
 public class WeaponAssignmentScript : MonoBehaviour {
 
-	public Button ready;
+	public Button ready, buy;
 	public Slider strength, range;
 	public GameObject weaponPanel, playerPanel, playerBP, weaponBP;
+	public Text coins, strengthText, rangeText;
 	private Text readyText;
 	public GameObject myScreen;
 	private GameRunningConstants grc;
 	private int selectedPlayer, selectedWeapon;
 	private ChessBoardFormation chess;
+	private int coinsleft, ccl;
 
 	// Use this for initialization
 	void Start () {
@@ -21,17 +23,141 @@ public class WeaponAssignmentScript : MonoBehaviour {
 		grc=GameRunningConstants.getInstance();
 		grc.weaponAssignmentScript=this;
 
+		chess=ChessBoardFormation.getInstance();
+
+		coinsleft = getCoinsLeft();
+		ccl=coinsleft;
+
 		ready.onClick.AddListener(()=>onReady());
 		ready.enabled=false;
 		readyText=ready.transform.FindChild("Text").GetComponent<Text>();
+
+		buy.onClick.AddListener(()=>buyClicked());
+
+		strength.wholeNumbers=true;
+		range.wholeNumbers=true;
+		strength.onValueChanged.AddListener((val)=>onStrengthChanged(val));
+		range.onValueChanged.AddListener((val)=>onRangeChanged(val));
 
 		selectedPlayer=-1;
 		selectedWeapon=-1;
 		initiatePanel();
 		refreshSliders();
-		chess=ChessBoardFormation.getInstance();
 	}
-	
+	private int getCoinsLeft(){
+		//TODO Write the segment for entering the number of coins
+		return 200;
+	}
+	private void buyClicked(){
+		//TODO On Buy Button is Clicked
+
+		if(selectedPlayer<0 || selectedWeapon<0 || ccl<0)
+			return;
+		else if(selectedWeapon==0){
+			buyDefenceAndSpeed();
+			return;
+		}
+
+		PlayerProperties pP=chess.gameFormation[selectedPlayer];
+		int i;
+		for(i=0;i<pP.powers.Count;i++){
+			if(pP.powers[i].id==selectedWeapon)
+				break;
+		}
+		
+		if(i==pP.powers.Count){
+			PowerStruct pS=new PowerStruct();
+			pS.id=selectedWeapon;
+			pS.range=5;
+			pS.strength=10;
+			pS.otherDef="";
+			pP.powers.Add(pS);
+		}else{
+			// pP.powers[i].strength=strength.value;
+			// pP.powers[i].range=(int)range.value;
+			var v= pP.powers[i];
+			v.strength=(int)strength.value;
+			v.range=(int)range.value;
+			pP.powers.RemoveAt(i);
+			pP.powers.Add(v);
+		}
+		coinsleft=ccl;
+		refreshSliders();
+	}
+	private void buyDefenceAndSpeed(){
+		chess.gameFormation[selectedPlayer].healthMetre=(int)strength.value;
+		chess.gameFormation[selectedPlayer].speed=(int)range.value;
+		coinsleft=ccl;
+		refreshSliders();
+	}
+	private void defenceChange(){
+		if(strength.value<chess.gameFormation[selectedPlayer].healthMetre)
+			strength.value=chess.gameFormation[selectedPlayer].healthMetre;
+		ccl=coinsleft-((int)strength.value - chess.gameFormation[selectedPlayer].healthMetre)*1-((int)range.value - chess.gameFormation[selectedPlayer].speed)*10;
+		coins.text="Coins left : "+coinsleft+"\nAfter Purchase : "+ccl;
+	}
+	private void speedChange(){
+		if(range.value<chess.gameFormation[selectedPlayer].speed)
+			range.value=chess.gameFormation[selectedPlayer].speed;
+		ccl=coinsleft-((int)strength.value - chess.gameFormation[selectedPlayer].healthMetre)*1-((int)range.value - chess.gameFormation[selectedPlayer].speed)*10;
+		coins.text="Coins left : "+coinsleft+"\nAfter Purchase : "+ccl;
+	}
+	private void onStrengthChanged(float val){
+		strengthText.text=""+val;
+		if(selectedPlayer<0 || selectedWeapon<0)
+			return;
+		else if(selectedWeapon==0){
+			defenceChange();
+			return;
+		}
+		
+		Dev.log(Tag.WeaponAssignmentScript,"Value Changed : "+val);
+		PlayerProperties pP=chess.gameFormation[selectedPlayer];
+		int i;
+		for(i=0;i<pP.powers.Count;i++){
+			if(pP.powers[i].id==selectedWeapon)
+				break;
+		}
+		ccl=coinsleft;
+		if(i==pP.powers.Count){
+			ccl=coinsleft-PowersContants.getInstance().powers[selectedWeapon].basePrice;
+		}else{
+			if(val<pP.powers[i].strength){
+				strength.value=pP.powers[i].strength;
+			}
+			ccl=coinsleft-PowersContants.getInstance().powers[selectedWeapon].priceSAdder*((int)strength.value-pP.powers[i].strength)-PowersContants.getInstance().powers[selectedWeapon].priceRAdder*((int)range.value-pP.powers[i].range);
+		}
+		coins.text="Coins left : "+coinsleft+"\nAfter Purchase : "+ccl;
+	}
+	private void onRangeChanged(float val){
+		rangeText.text=""+val;
+		if(selectedPlayer<0 || selectedWeapon<0)
+			return;
+		else if(selectedWeapon==0){
+			speedChange();
+			return;
+		}
+		
+		Dev.log(Tag.WeaponAssignmentScript,"Value Changed : "+val);
+
+		PlayerProperties pP=chess.gameFormation[selectedPlayer];
+		int i;
+		for(i=0;i<pP.powers.Count;i++){
+			if(pP.powers[i].id==selectedWeapon)
+				break;
+		}
+		ccl=coinsleft;
+		if(i==pP.powers.Count){
+			ccl=coinsleft-PowersContants.getInstance().powers[selectedWeapon].basePrice;
+		}else{
+			if(val<pP.powers[i].range){
+				range.value=pP.powers[i].range;
+			}
+			ccl=coinsleft-PowersContants.getInstance().powers[selectedWeapon].priceSAdder*((int)strength.value-pP.powers[i].strength)-PowersContants.getInstance().powers[selectedWeapon].priceRAdder*((int)range.value-pP.powers[i].range);
+		}
+		coins.text="Coins left : "+coinsleft+"\nAfter Purchase : "+ccl;
+	}
+
 	private void onReady(){
 		myScreen.SetActive(true);
 	}
@@ -119,6 +245,7 @@ public class WeaponAssignmentScript : MonoBehaviour {
 				range.value=pP.powers[i].range;
 			}
 		}
+		coins.text="Coins left : "+coinsleft+"\nAfter Purchase : "+ccl;
 	}
 	// Update is called once per frame
 	void Update () {

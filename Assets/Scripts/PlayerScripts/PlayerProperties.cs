@@ -45,8 +45,8 @@ public class PlayerProperties {
 			playerType=0;
 			addPowers(1,20,20);
 		}
-		loc.x=playerIndex;
-		loc.y=0;
+		loc.x=playerIndex%GameContants.sizeOfBoardX;
+		loc.y=playerIndex/GameContants.sizeOfBoardX;
 	}
 	private void Load() {
 		if(File.Exists(Application.persistentDataPath + fileName)) {

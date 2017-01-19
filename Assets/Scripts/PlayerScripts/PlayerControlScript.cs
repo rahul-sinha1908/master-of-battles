@@ -62,6 +62,8 @@ public class PlayerControlScript : MonoBehaviour {
 		me=player;
 		playerDet=p;
 		playerNetScript=playNet;
+		if(me!=null)
+			me.curHealth=me.healthMetre;
 
 		playerIdentity=transform.FindChild("PlayerIdentity");
 		if(playerIdentity!=null){

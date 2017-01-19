@@ -7,6 +7,7 @@ namespace MasterOfBattles{
 		public string description;
 		public string explanationLink;
 		public int id;
+		public int basePrice, priceSAdder, priceSMultiplier, priceRAdder, priceRMultiplier;
 	};
 	public struct PowerStruct{
 		public int id,strength,range;
@@ -27,6 +28,9 @@ namespace MasterOfBattles{
 		private PowerNameId addPower(int i){
 			PowerNameId p=new PowerNameId();
 			p.id=i;
+			p.basePrice=20;
+			p.priceSAdder=p.priceRAdder=10;
+			p.priceSMultiplier=p.priceRMultiplier=10;
 			if(i==0){
 				p.name="Run into another Player";
 				p.description="If you run into some other player in the same block, your health will be reduced with the health of the other player. And the one whose health is less than the other dies.";
