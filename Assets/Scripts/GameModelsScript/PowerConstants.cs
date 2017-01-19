@@ -16,7 +16,7 @@ namespace MasterOfBattles{
 	public class PowersContants{
 		static PowersContants instance;
 		public List<PowerNameId> powers;
-		int total=5;
+		public int total=5;
 		//public static PowerNameId
 		private PowersContants(){
 			powers=new List<PowerNameId>();
