@@ -64,11 +64,11 @@ public class MyPlayerScript : NetworkBehaviour {
 			}
 			//TODO Fix th authority problem.
 		}
+		chess=ChessBoardFormation.getInstance();
+		myBoard=chess.myBoard;
 		//initLocalVar();
 	}
 	public void initLocalVar(){
-		chess=ChessBoardFormation.getInstance();
-		myBoard=chess.myBoard;
 		if(isLocalPlayer){
 			cam=Camera.main;
 			gameMoveListener=GameObject.Find("CheckBoard").GetComponent<GameMoveListener>();
@@ -87,9 +87,8 @@ public class MyPlayerScript : NetworkBehaviour {
 			gameMoveListener.updateCameraPositionAndVariable(isServer,this,timeTracker, playerControls);
 			if(!isServer){
 				CmdInitiatePlayers(players);
-				// short[] a=new short[1];
-				// a[0]=10;
-				// CmdCheck(a);
+			}else{
+				RpcInitiatePlayers(players);
 			}
 		}
 	}
@@ -120,6 +119,7 @@ public class MyPlayerScript : NetworkBehaviour {
 				playerControls[i].initializePlayer(isServer, isLocalPlayer, chess.gameFormation[i], this, players[i]);
 			else{
 				playerControls[i].initializePlayer(isServer, isLocalPlayer, this, players[i]);
+				GameRunningConstants.getInstance().networkPlayerInit=true;
 			}
 			if(myTeam){
 				myBoard[players[i].x,players[i].y]=TypeO.MyPlayer;
@@ -192,8 +192,8 @@ public class MyPlayerScript : NetworkBehaviour {
 		this.players=players;
 		createPlayer(false);
 		initOtherPlayer();
-		MyPlayerScript oP=otherPlayer.GetComponent<MyPlayerScript>();
-		oP.RpcInitiatePlayers(oP.players);
+		//MyPlayerScript oP=otherPlayer.GetComponent<MyPlayerScript>();
+		//otherPlayerScript.RpcInitiatePlayers(otherPlayerScript.players);
 	}
 
 	[ClientRpc]

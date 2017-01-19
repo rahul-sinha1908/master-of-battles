@@ -18,7 +18,7 @@ public class PlayerControlScript : MonoBehaviour {
 	private PlayerDetails playerDet;
 	private bool isAlive;
 	private MyPlayerScript playerNetScript;
-	private InputManager inputManager;
+	//private InputManager inputManager;
 	private bool isPlayerMoving=false;
 	private Transform playerIdentity;
 	private MeshRenderer playerIdentityMesh;
@@ -31,7 +31,7 @@ public class PlayerControlScript : MonoBehaviour {
 		controller=GetComponent<CharacterController>();
 		if(particles==null)
 			Dev.log(Tag.UnOrdered,"Particle is Null");
-		inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
+		//inputManager=GameObject.Find("MyScreen").GetComponent<InputManager>();
 		//doAttack(new PowerStruct());
 	}
 	

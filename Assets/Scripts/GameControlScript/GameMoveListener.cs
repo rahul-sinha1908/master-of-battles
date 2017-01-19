@@ -175,7 +175,7 @@ public class GameMoveListener : MonoBehaviour {
 		if(Application.isMobilePlatform){
 			if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved) {
 				Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
-				touchDeltaPosition=touchDeltaPosition*PlayerPrefs.GetFloat(UserPrefs.mobPanSensitivity, 0.2f);
+				touchDeltaPosition=touchDeltaPosition*PlayerPrefs.GetFloat(UserPrefs.mobPanSensitivity, 0.6f);
 				Pan(touchDeltaPosition);
 			}else if (Input.touchCount == 2){
 				detectZoom(0);
@@ -193,7 +193,6 @@ public class GameMoveListener : MonoBehaviour {
 					delta = delta * PlayerPrefs.GetFloat(UserPrefs.moveSensitivity, 0.2f);
 					Pan(delta);
 				}
-				
 			}
 		}
 		if(selectedPlayerInd!=-1){

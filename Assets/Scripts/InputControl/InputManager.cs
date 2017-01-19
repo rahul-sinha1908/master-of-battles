@@ -19,20 +19,25 @@ public class InputManager: MonoBehaviour{
 	[SerializeField]
 	private GameObject WeaponInventory;
 	[SerializeField]
-	private GameObject sendButton,timeWindow, healthBar;
+	private GameObject sendButton,timeWindow, healthBar,waiting;
 	private Text timeText,healthBarText;
 	private TimeTracker timeTracker;
 	private bool checkEnteredCounter=false;
 	private MyPlayerScript myPlayer;
 	private GameMoveListener gameMove;
+	private bool netPlayerInit=false;
 	void Start()
 	{
 		Dev.log(Tag.WeaponAssignmentScript, "Input Manager is initialised");
 		GameRunningConstants.getInstance().inputManager=this;
 		GameRunningConstants.getInstance().weaponAssignmentScript.gameObject.SetActive(false);
 		GameRunningConstants.getInstance().localPlayerScript.initLocalVar();
-		GameRunningConstants.getInstance().disableClicks=false;
 		
+		OtherPlatform.SetActive(false);
+		MobilePlatform.SetActive(false);
+		waiting.SetActive(true);
+	}
+	private void init(){
 		OtherPlatform.SetActive(true);
 		if(Application.isMobilePlatform){
 			MobilePlatform.SetActive(true);
@@ -45,16 +50,20 @@ public class InputManager: MonoBehaviour{
 			// MobilePlatform.SetActive(true);
 			// OtherPlatform.SetActive(false);
 		}
-		init();
-	}
-	private void init(){
+		
 		timeText=timeWindow.GetComponent<Text>();
 		healthBarText=healthBar.GetComponent<Text>();
 	}
 	void Update()
 	{
+		if(GameRunningConstants.getInstance().networkPlayerInit && !netPlayerInit){
+			init();
+			waiting.SetActive(false);
+			GameRunningConstants.getInstance().disableClicks=false;
+			netPlayerInit=true;
+		}else if(!netPlayerInit)
+			return;
 		checkTime();
-
 		//if(Input.GetKey(KeyCode.))
 		Vector2 v= checkInputs();
 		if(v!=Vector2.zero){
@@ -121,7 +130,7 @@ public class InputManager: MonoBehaviour{
 		NetworkManager.singleton.StopClient();
 	}
 	public void sendMoves(){
-		Dev.log(Tag.UnOrdered,"Sending Moves");
+		Dev.log(Tag.InputManager,"Sending Moves");
 		gameMove.disableClicksforX();
 		timeTracker.sendMovesFromTimeTracker();
 		sendButton.SetActive(false);
