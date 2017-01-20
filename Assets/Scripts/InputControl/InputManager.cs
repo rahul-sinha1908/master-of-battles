@@ -39,6 +39,7 @@ public class InputManager: MonoBehaviour{
 	}
 	private void init(){
 		OtherPlatform.SetActive(true);
+		//if(Application.isMobilePlatform || Application.platform==RuntimePlatform.LinuxEditor){
 		if(Application.isMobilePlatform){
 			MobilePlatform.SetActive(true);
 			//OtherPlatform.SetActive(false);

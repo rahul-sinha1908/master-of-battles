@@ -30,6 +30,9 @@ public class CheckSelectScript : MonoBehaviour {
 		//generateTriangles();
 	}
 
+	private void Start(){
+		GameRunningConstants.getInstance().checkSelectScript=this;
+	}
 	private void generateVerticesAndTriangle(int x, int y, int colorInd){
 		x=x-GameContants.sizeOfBoardX/2;
 		y=y-GameContants.sizeOfBoardY/2;

@@ -8,6 +8,7 @@ public class WeaponControlScript : MonoBehaviour {
 
 	public Transform weaponButton;
 	public RectTransform weaponInventory, weaponDetails, weaponHolder;
+	private GameObject quad;
 	private GameRunningConstants grc;
 	// Use this for initialization
 	void Start () {
@@ -31,7 +32,6 @@ public class WeaponControlScript : MonoBehaviour {
 	void Update () {
 		
 	}
-
 	public void hideWeapons(){
 		weaponInventory.gameObject.SetActive(false);
 		weaponDetails.gameObject.SetActive(false);
@@ -62,4 +62,67 @@ public class WeaponControlScript : MonoBehaviour {
 		Text t=go.FindChild("Text").GetComponent<Text>();
 		t.text=PowersContants.getInstance().powers[p.id].name;
 	}
+
+	public List<Point> getAttackList(PlayerDetails p, PowerStruct power, Moves attackM){
+		List<Point> list;
+		list = getPowerPlaces(power.id, power.range, power.strength, p.x, p.y, attackM);
+
+		return list;
+	}
+	private List<Point> getPowerPlaces(int id, int range, int strength, int x, int y, Moves m){
+		List<Point> list = new List<Point>();
+		int dr=Mathf.RoundToInt(range/GameContants.sqrt2);
+		Dev.log(Tag.WeaponControlScript, "Attack Id = "+id);
+		if(id==1){
+			for(int i=0;i<range;i++){
+				Point p=new Point();
+				p.x=x+i+1;
+				p.y=y;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+				p=new Point();
+				p.x=x-i-1;
+				p.y=y;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+				p=new Point();
+				p.x=x;
+				p.y=y+i+1;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+				p=new Point();
+				p.x=x;
+				p.y=y-i-1;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+			}
+			for(int i=0;i<dr;i++){
+				Point p=new Point();
+				p.x=x+i+1;
+				p.y=y+i+1;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+				p=new Point();
+				p.x=x-i-1;
+				p.y=y-i-1;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+				p=new Point();
+				p.x=x-i-1;
+				p.y=y+i+1;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+				p=new Point();
+				p.x=x+i+1;
+				p.y=y-i-1;
+				if(GameMethods.validatePoint(p) && !GameMethods.compareMovesAndPoints(m,p))
+					list.Add(p);
+			}
+		}else if(id==2){
+
+		}
+
+		return list;
+	} 
+
 }

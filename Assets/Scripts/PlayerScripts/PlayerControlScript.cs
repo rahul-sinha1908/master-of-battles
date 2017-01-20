@@ -89,9 +89,9 @@ public class PlayerControlScript : MonoBehaviour {
 
 	public void doAttack(int x1, int y1, int x2, int y2, PowerStruct p){
 		disableAllProps();
-		// if(p.id==1){
+		if(p.id==1){
 			straightAttack(x1,y1,x2,y2,p);
-		// }
+		}
 	}
 	private void disableAllProps(){
 		//TODO disable all the properties of the Particle System.
@@ -102,7 +102,7 @@ public class PlayerControlScript : MonoBehaviour {
 		Vector3 pos=GameMethods.getHitVector(x1,y1,1);
 		Vector3 pos1=GameMethods.getHitVector(x2,y2,1);
 		Vector3 finalPos=pos1;
-		Dev.log(Tag.PlayerControlScript,"Shooting from "+pos+" to "+pos1);
+		Dev.log(Tag.PlayerAttack,"Shooting from "+pos+" to "+pos1);
 
 		Vector3 dir=pos1-pos;
 		RaycastHit hit;
@@ -110,7 +110,7 @@ public class PlayerControlScript : MonoBehaviour {
 			GameObject g=hit.collider.gameObject;
 			if(GameMethods.sqrDist(pos,pos1)+GameContants.boxSize/2.0f>GameMethods.sqrDist(pos,hit.point)){
 				finalPos=hit.point;
-				Dev.log(Tag.PlayerControlScript,"Hit the target : "+g.name);
+				Dev.log(Tag.PlayerAttack,"Hit the target : "+g.name);
 				if(g!=null){
 					PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
 					if(pl!=null)

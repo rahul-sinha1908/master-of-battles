@@ -28,6 +28,7 @@ namespace MasterOfBattles{
 		public static int sizeOfBoardY=30;
 		public static int boxSize=3;
 		public static int timeConstant=10;
+		public static float sqrt2=1.4142135624f;
 		public static GameContants instance;
 
 		public string[] playerNames;

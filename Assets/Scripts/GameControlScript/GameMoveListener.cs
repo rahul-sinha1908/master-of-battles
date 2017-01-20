@@ -306,11 +306,6 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		return false;
 	}
-	private bool validatePoint(Point p){
-		if(p.x>=0 && p.x<GameContants.sizeOfBoardX && p.y>=0 && p.y<GameContants.sizeOfBoardY)
-			return true;
-		return false;
-	}
 	private PowerStruct getDefaultPower(int ind){
 		//TODO Get the Power that is selected.
 		List<PowerStruct> allPowers = playerProp[ind].powers;
@@ -339,72 +334,77 @@ public class GameMoveListener : MonoBehaviour {
 			Dev.log(Tag.PlayerAttack,"WeaponCS is not Initialised");
 
 		PowerStruct power=getDefaultPower(ind);
-		int range = power.range;
-		int x=players[ind].x,y=players[ind].y;
-		for(int i=0;i<GameContants.sizeOfBoardX;i++){
-			Point p=new Point();
-			p.x=i;
-			p.y=players[ind].y;
-			if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-				selectScript.showSelectedTiles(p,BoardConstants.Select);
-			else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-				list.Add(p);				
-			p=new Point();
-			p.y=i;
-			p.x=players[ind].x;
-			if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-				selectScript.showSelectedTiles(p,BoardConstants.Select);
-			else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-				list.Add(p);
+
+		// for(int i=0;i<GameContants.sizeOfBoardX;i++){
+		// 	Point p=new Point();
+		// 	p.x=i;
+		// 	p.y=players[ind].y;
+		// 	if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+		// 		selectScript.showSelectedTiles(p,BoardConstants.Select);
+		// 	else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+		// 		list.Add(p);				
+		// 	p=new Point();
+		// 	p.y=i;
+		// 	p.x=players[ind].x;
+		// 	if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+		// 		selectScript.showSelectedTiles(p,BoardConstants.Select);
+		// 	else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+		// 		list.Add(p);
+		// }
+		// //DONE Do Somethings for diagonal Points
+		// for(int i=0;;i++){
+		// 	bool b=false;
+		// 	Point p=new Point();
+		// 	p.x=x+i;
+		// 	p.y=y+i;
+		// 	if(validatePoint(p)){
+		// 		b=true;
+		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
+		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+		// 			list.Add(p);
+		// 	}
+		// 	p=new Point();
+		// 	p.x=x-i;
+		// 	p.y=y-i;
+		// 	if(validatePoint(p)){
+		// 		b=true;
+		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
+		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+		// 			list.Add(p);
+		// 	}
+		// 	p=new Point();
+		// 	p.x=x-i;
+		// 	p.y=y+i;
+		// 	if(validatePoint(p)){
+		// 		b=true;
+		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
+		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+		// 			list.Add(p);
+		// 	}
+		// 	p=new Point();
+		// 	p.x=x+i;
+		// 	p.y=y-i;
+		// 	if(validatePoint(p)){
+		// 		b=true;
+		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
+		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
+		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
+		// 			list.Add(p);
+		// 	}
+		// 	if(b==false)
+		// 		break;
+		// }
+		if(attackMoveT[ind].x==-1 || attackMoveT[ind].y==-1)
+			selectScript.showSelectedTiles(list,BoardConstants.Select);
+		else{
+			Point p;p.x=attackMoveT[ind].x;p.y=attackMoveT[ind].y;
+			selectScript.showSelectedTiles(p,BoardConstants.Select);
 		}
-		//TODO Do Somethings for diagonal Points
-		for(int i=0;;i++){
-			bool b=false;
-			Point p=new Point();
-			p.x=x+i;
-			p.y=y+i;
-			if(validatePoint(p)){
-				b=true;
-				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-					list.Add(p);
-			}
-			p=new Point();
-			p.x=x-i;
-			p.y=y-i;
-			if(validatePoint(p)){
-				b=true;
-				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-					list.Add(p);
-			}
-			p=new Point();
-			p.x=x-i;
-			p.y=y+i;
-			if(validatePoint(p)){
-				b=true;
-				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-					list.Add(p);
-			}
-			p=new Point();
-			p.x=x+i;
-			p.y=y-i;
-			if(validatePoint(p)){
-				b=true;
-				if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-					selectScript.showSelectedTiles(p,BoardConstants.Select);
-				else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-					list.Add(p);
-			}
-			if(b==false)
-				break;
-		}
-		listPossibleMoves=list;
-		selectScript.addSelectedTiles(list,BoardConstants.Attack);
+		listPossibleMoves=grc.weaponControlScript.getAttackList(players[ind], power, attackMoveT[ind]);
+		selectScript.addSelectedTiles(listPossibleMoves,BoardConstants.Attack);
 	}
 	private void searchPossibleMoves(int ind, bool move, Point pt){
 	//private void searchPossibleMoves(int ind, bool move){

@@ -11,6 +11,7 @@ namespace MasterOfBattles{
 		public DisplayInformation displayInformation;
 		public MyPlayerScript localPlayerScript, networkPlayerScript;
 		public GameMoveListener gameMoveListener;
+		public CheckSelectScript checkSelectScript;
 		public WeaponAssignmentScript weaponAssignmentScript;
 		public bool disableClicks, networkPlayerInit;
 
