@@ -27,8 +27,8 @@ namespace MasterOfBattles{
 			list[(int)Tag.GameMoveListener]=false;
 			list[(int)Tag.UnOrdered]=false;
 			list[(int)Tag.WeaponControlScript]=true;
-			list[(int)Tag.DisplayInformation]=true;
-			list[(int)Tag.WeaponAssignmentScript]=true;
+			list[(int)Tag.DisplayInformation]=false;
+			list[(int)Tag.WeaponAssignmentScript]=false;
 			list[(int)Tag.InputManager]=true;
 			//list[(int)Tag.]=true;
 		}

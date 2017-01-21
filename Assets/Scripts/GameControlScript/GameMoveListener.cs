@@ -309,94 +309,48 @@ public class GameMoveListener : MonoBehaviour {
 	private PowerStruct getDefaultPower(int ind){
 		//TODO Get the Power that is selected.
 		List<PowerStruct> allPowers = playerProp[ind].powers;
-		int defPower=0;
-		PowerStruct power=allPowers[defPower];
+		int defPower=PlayerPrefs.GetInt("RahulWeapon"+ind,1);
+		PowerStruct power=new PowerStruct();
+		for(int i=0;i<allPowers.Count;i++){
+			if(allPowers[i].id==defPower)
+				power=allPowers[i];
+		}
 
 		//Range Should not be changed here.
 		//TODO Take the stored strength and Other Definition for this
-		int strength=power.strength;
+		int strength=PlayerPrefs.GetInt("RahulWeapon"+ind+"-"+defPower,power.strength);
 		power.strength=strength;
 		return power;
 	}
-	private void setDefaultPower(int ind, int defP, int strength){
+	public void setDefaultPower(int ind, int defP, int strength){
 		//TODO Set the strength for a particular defP for a Particular Player.
+		PlayerPrefs.SetInt("RahulWeapon"+ind+"-"+defP,strength);
 	}
-	private void setDefaultPower(int ind, int defP){
+	public void setDefaultPower(int ind, int defP){
 		//TODO Set default defP for a Particular Player.
+
+		/*
+		Name - RahulWeapon[IND] in PlayerPref
+		Storing Strength in RahulWeapon[IND][DEFP]
+		*/
+
+		PlayerPrefs.SetInt("RahulWeapon"+ind,defP);
+	}
+	public void refreshWeaponDisplay(int ind){
+		grc.weaponControlScript.showWeapons();
+		searchPossibleAttacks(ind);
 	}
 	private void searchPossibleAttacks(int ind){
 		List<Point> list=new List<Point>();
 		Dev.log(Tag.PlayerAttack,"Its Here : "+attackMoveT[ind].x+" : "+attackMoveT[ind].y);
 		
 		if(grc.weaponControlScript!=null)
-			grc.weaponControlScript.callToAddWeapon(playerProp[ind]);
+			grc.weaponControlScript.callToAddWeapon(playerProp[ind], ind);
 		else
 			Dev.log(Tag.PlayerAttack,"WeaponCS is not Initialised");
 
 		PowerStruct power=getDefaultPower(ind);
 
-		// for(int i=0;i<GameContants.sizeOfBoardX;i++){
-		// 	Point p=new Point();
-		// 	p.x=i;
-		// 	p.y=players[ind].y;
-		// 	if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-		// 		selectScript.showSelectedTiles(p,BoardConstants.Select);
-		// 	else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-		// 		list.Add(p);				
-		// 	p=new Point();
-		// 	p.y=i;
-		// 	p.x=players[ind].x;
-		// 	if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-		// 		selectScript.showSelectedTiles(p,BoardConstants.Select);
-		// 	else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-		// 		list.Add(p);
-		// }
-		// //DONE Do Somethings for diagonal Points
-		// for(int i=0;;i++){
-		// 	bool b=false;
-		// 	Point p=new Point();
-		// 	p.x=x+i;
-		// 	p.y=y+i;
-		// 	if(validatePoint(p)){
-		// 		b=true;
-		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
-		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-		// 			list.Add(p);
-		// 	}
-		// 	p=new Point();
-		// 	p.x=x-i;
-		// 	p.y=y-i;
-		// 	if(validatePoint(p)){
-		// 		b=true;
-		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
-		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-		// 			list.Add(p);
-		// 	}
-		// 	p=new Point();
-		// 	p.x=x-i;
-		// 	p.y=y+i;
-		// 	if(validatePoint(p)){
-		// 		b=true;
-		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
-		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-		// 			list.Add(p);
-		// 	}
-		// 	p=new Point();
-		// 	p.x=x+i;
-		// 	p.y=y-i;
-		// 	if(validatePoint(p)){
-		// 		b=true;
-		// 		if(p.x==attackMoveT[ind].x && p.y==attackMoveT[ind].y)
-		// 			selectScript.showSelectedTiles(p,BoardConstants.Select);
-		// 		else if(Math.Max(Math.Abs(x-p.x), Math.Abs(y-p.y))<=range)
-		// 			list.Add(p);
-		// 	}
-		// 	if(b==false)
-		// 		break;
-		// }
 		if(attackMoveT[ind].x==-1 || attackMoveT[ind].y==-1)
 			selectScript.showSelectedTiles(list,BoardConstants.Select);
 		else{

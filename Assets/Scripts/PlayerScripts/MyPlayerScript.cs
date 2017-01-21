@@ -138,7 +138,9 @@ public class MyPlayerScript : NetworkBehaviour {
 			return;
 		Moves[] moves;
 		gameMoveListener.generateMoves();
+		Dev.log(Tag.PlayerMove,"Wait For Other Player : "+isServer+" : "+gameMoveListener.getisClickActive());
 		gameMoveListener.waitForOtherPlayers();
+		Dev.log(Tag.PlayerMove,"Wait For Other Player : "+isServer+" : "+gameMoveListener.getisClickActive());
 		if(movesList.Count>0){
 			moves=movesList.ToArray();
 			movesList.Clear();
@@ -344,7 +346,8 @@ public class MyPlayerScript : NetworkBehaviour {
 		StartCoroutine(doAttackSequence());
 	}
 	public void prepareForNext(){
-		if(!gameMoveListener.getisClickActive())
+		Dev.log(Tag.PlayerMove, "Checking clicks : "+isServer+" : "+gameMoveListener.getisClickActive());
+		if(isLocalPlayer)
 			gameMoveListener.prepareForNextMove();
 	}
 }

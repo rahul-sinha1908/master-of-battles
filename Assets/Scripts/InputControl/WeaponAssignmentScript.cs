@@ -9,7 +9,7 @@ public class WeaponAssignmentScript : MonoBehaviour {
 	public Button ready, buy;
 	public Slider strength, range;
 	public GameObject weaponPanel, playerPanel, playerBP, weaponBP;
-	public Text coins, strengthText, rangeText;
+	public Text coins, strengthText, rangeText, informationText;
 	private Text readyText;
 	public GameObject myScreen;
 	private GameRunningConstants grc;
@@ -213,6 +213,7 @@ public class WeaponAssignmentScript : MonoBehaviour {
 			return;
 		}
 		
+		informationText.text="Player : "+(selectedPlayer+1)+"\nWeapon : "+PowersContants.getInstance().powers[selectedWeapon].name;
 		strength.enabled=true;
 		range.enabled=true;
 		PlayerProperties pP=chess.gameFormation[selectedPlayer];
