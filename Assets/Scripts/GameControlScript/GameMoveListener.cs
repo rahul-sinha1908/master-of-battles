@@ -381,7 +381,8 @@ public class GameMoveListener : MonoBehaviour {
 					Point p;
 					p.x=i;
 					p.y=j;
-					if((i==x && j==y) || (i==pt.x&& j==pt.y)){
+					//if((i==x && j==y) || (i==pt.x&& j==pt.y)){
+					if(i==pt.x&& j==pt.y){	
 						tempThresh=p;
 						continue;
 					}

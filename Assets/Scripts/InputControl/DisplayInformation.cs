@@ -42,10 +42,10 @@ public class DisplayInformation : MonoBehaviour {
 	}
 	public void displayStatistic(){
 		statisticCanvas.SetActive(!statisticCanvas.activeSelf);
+		grc.checkSelectScript.clearAllBoxes();
 		if(statisticCanvas.activeSelf){
 			grc.gameMoveListener.setIsClickActive(false);
 			grc.gameMoveListener.clearListPossibleMoves();
-			grc.checkSelectScript.clearAllBoxes();
 		}else{
 			grc.gameMoveListener.setIsClickActive(true);
 			destroyAllChilds(statisticCanvas.transform);
@@ -57,7 +57,7 @@ public class DisplayInformation : MonoBehaviour {
 		Even the moves of the own player could be shown to show the effect on the opponent players.
 		*/
 
-		//TODO Do the functionality of making the panel filled with the detials of the previous moves.
+		//DONE Do the functionality of making the panel filled with the detials of the previous moves.
 		Dev.log(Tag.DisplayInformation,"Sizes : "+grc.backUpOppAttackMoves.Count+" : "+ grc.backUpOppPlaceMoves.Count+" : "+grc.backUpMyMoves.Count);
 		for(int i=0;i<grc.backUpOppAttackMoves.Count;i++){
 			GameObject go = GameObject.Instantiate(statisticUIPrefab, statisticCanvas.transform);
