@@ -133,6 +133,10 @@ public class CheckSelectScript : MonoBehaviour {
 		listRef.Add(r);
 		return -1;
 	}
+	public void clearAllBoxes(){
+		List<Point> list=new List<Point>();
+		showSelectedTiles(list, BoardConstants.Select);
+	}
 	private void removeExisting(int i){
 		List<Point> list=new List<Point>();
 		List<int> col=new List<int>();

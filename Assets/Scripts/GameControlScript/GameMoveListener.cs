@@ -269,7 +269,7 @@ public class GameMoveListener : MonoBehaviour {
 			changePlayerIdentityMaterial(selectedPlayerInd);
 
 		}else{//Attack Sequence
-
+		
 			p.x=boxX;
 			p.y=boxY;
 			if(isPossibleMove(p)){
@@ -423,6 +423,9 @@ public class GameMoveListener : MonoBehaviour {
 		}
 		return -1;
 	}
+	public void clearListPossibleMoves(){
+		listPossibleMoves.Clear();
+	}
 	public void updateCameraPositionAndVariable(bool isServer, MyPlayerScript obj, TimeTracker track, PlayerControlScript[] playerC){
 		this.isServer=isServer;
 		if(!isServer){
@@ -470,6 +473,9 @@ public class GameMoveListener : MonoBehaviour {
 	}
 	public void waitForOtherPlayers(){
 		isClicksActive=false;
+	}
+	public void setIsClickActive(bool b){
+		isClicksActive=b;
 	}
 	public bool getisClickActive(){
 		return isClicksActive;

@@ -24,11 +24,13 @@ public class MyPlayerScript : NetworkBehaviour {
 	public List<Moves> movesList;
 	public float moveSpeed=15f;
 	private ChessBoardFormation chess;
+	private GameRunningConstants grc;
 	private TypeO[,] myBoard;
 
 	private void Start () {
 		Dev.log(Tag.UnOrdered,"My Ip Address : "+ isServer + " : "+Network.player.ipAddress);
 
+		grc=GameRunningConstants.getInstance();
 		if(isLocalPlayer)
 			GameRunningConstants.getInstance().localPlayerScript=this;
 		else
@@ -231,18 +233,21 @@ public class MyPlayerScript : NetworkBehaviour {
 
 //Remote Calls Till Here
 	private void doAllThresholdMoves(Moves[] moves){
-		//TODO Complete the threshold Move
+		//DONE Complete the threshold Move
 		if(otherPlayerScript!=null)
 			otherPlayerScript.gameMoveListener.deselectAllPlayers();
 		attackMoves.Clear();
+		grc.clearMyBackUp();
 		for(int i=0;i<moves.Length;i++){
 			Dev.log(Tag.PlayerMove,"ind = "+moves[i].ind+" attackDef="+moves[i].attackDef);
 			if(moves[i].attackDef==""){
 				Dev.log(Tag.PlayerMove,"Entered Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
+				grc.addOpponentPlaceMoves(players[moves[i].ind]);
 				players[moves[i].ind].x=moves[i].x;
 				players[moves[i].ind].y=moves[i].y;
 				Dev.log(Tag.PlayerMove,"Exit Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 			}else{
+				grc.addOpponentAttackMoves(moves[i]);
 				attackMoves.Add(moves[i]);
 			}
 		}
@@ -318,7 +323,7 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 	private IEnumerator doAttackSequence(){
 		if(attackMoves.Count>0){
-			//TODO Do the attack Sequence
+			//DONE Do the attack Sequence
 			Dev.log(Tag.PlayerAttack,"Total Attack Sequence : "+isLocalPlayer+" : "+attackMoves.Count);
 			for(int i=0;i<attackMoves.Count;i++){
 				int x1,y1,x2,y2;
@@ -341,8 +346,11 @@ public class MyPlayerScript : NetworkBehaviour {
 	}
 	public void prepareForAttack(){
 		//DONE call prepare for next
-		if(isLocalPlayer)
+		if(isLocalPlayer){
 			Dev.log(Tag.PlayerAttack,"It Came Here prepare for Attack");
+			for(int i=0;i<attackMoves.Count;i++)
+				grc.addMyAttackMoves(attackMoves[i]);
+		}
 		StartCoroutine(doAttackSequence());
 	}
 	public void prepareForNext(){
