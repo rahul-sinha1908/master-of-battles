@@ -22,14 +22,14 @@ namespace MasterOfBattles{
 	};
 
 	public class GameContants{
-		public static int NumberOfPlayer=30;
-		public static int DefaultHealth=50;
-		public static int sizeOfBoardX=30;
-		public static int sizeOfBoardY=30;
-		public static int boxSize=3;
-		public static int timeConstant=10;
-		public static float sqrt2=1.4142135624f;
-		public static GameContants instance;
+		public int NumberOfPlayer=30;
+		public int DefaultHealth=50;
+		public int sizeOfBoardX=30;
+		public int sizeOfBoardY=30;
+		public int boxSize=3;
+		public int timeConstant=10;
+		public float sqrt2=1.4142135624f;
+		private static GameContants instance;
 
 		public string[] playerNames;
 		private GameContants(){

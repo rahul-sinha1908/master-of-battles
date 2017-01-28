@@ -7,8 +7,8 @@ using MasterOfBattles;
 
 public class GameMoveListener : MonoBehaviour {
 	private InputManager inputManager;
-	private int offsetHitX=GameContants.sizeOfBoardX/2;
-	private int offsetHitY=GameContants.sizeOfBoardY/2;
+	private int offsetHitX=GameContants.getInstance().sizeOfBoardX/2;
+	private int offsetHitY=GameContants.getInstance().sizeOfBoardY/2;
 	private PowersContants powerDatabase;
 	[SerializeField]
 	private LayerMask mask;
@@ -156,10 +156,10 @@ public class GameMoveListener : MonoBehaviour {
 	private void Pan(Vector2 touchDeltaPosition){
 		if(!isServer)
 			touchDeltaPosition=-touchDeltaPosition;
-		if(Mathf.Abs(cam.transform.position.x)> GameContants.sizeOfBoardX*GameContants.boxSize/2 && Mathf.Abs(cam.transform.position.x-touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
+		if(Mathf.Abs(cam.transform.position.x)> GameContants.getInstance().sizeOfBoardX*GameContants.getInstance().boxSize/2 && Mathf.Abs(cam.transform.position.x-touchDeltaPosition.x)>Mathf.Abs(cam.transform.position.x))
 			touchDeltaPosition.x=0;
 		//TODO Take care of this constant value if ever camera position is changed
-		if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.boxSize && Mathf.Abs(cam.transform.position.z-touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
+		if(Mathf.Abs(cam.transform.position.z)> 33*GameContants.getInstance().boxSize && Mathf.Abs(cam.transform.position.z-touchDeltaPosition.y)>Mathf.Abs(cam.transform.position.z))
 			touchDeltaPosition.y=0;
 		cam.transform.Translate(-touchDeltaPosition.x * camPanSpeed, 0, -touchDeltaPosition.y * camPanSpeed, Space.World);
 	}
@@ -213,8 +213,8 @@ public class GameMoveListener : MonoBehaviour {
 		//DONE Put a layer mask on this.
 		if(Physics.Raycast(ray,out hit,10000,mask)){
 			//DONE Divide this by a constant if you want to increase the area of the play
-			boxX=(int)Mathf.Floor(hit.point.x/GameContants.boxSize)+offsetHitX;
-			boxY=(int)Mathf.Floor(hit.point.z/GameContants.boxSize)+offsetHitY;
+			boxX=(int)Mathf.Floor(hit.point.x/GameContants.getInstance().boxSize)+offsetHitX;
+			boxY=(int)Mathf.Floor(hit.point.z/GameContants.getInstance().boxSize)+offsetHitY;
 			Dev.log(Tag.PlayerSelect,hit.point+" : "+boxX+" : "+boxY);
 			Point p;
 			p.x=boxX;
@@ -376,7 +376,7 @@ public class GameMoveListener : MonoBehaviour {
 		if(applyeRestrictions){
 			for(int i=x-speed;i<=x+speed;i++){
 				for(int j=y-speed;j<=y+speed;j++){
-					if(i<0 || j<0 || i>=GameContants.sizeOfBoardX || j>=GameContants.sizeOfBoardY)
+					if(i<0 || j<0 || i>=GameContants.getInstance().sizeOfBoardX || j>=GameContants.getInstance().sizeOfBoardY)
 						continue;
 					Point p;
 					p.x=i;
@@ -394,13 +394,13 @@ public class GameMoveListener : MonoBehaviour {
 			x=players[ind].x;
 			y=players[ind].y;
 			//TODO Vary top as needed in the later stage
-			int bot=0, top=GameContants.sizeOfBoardY/5;
+			int bot=0, top=GameContants.getInstance().sizeOfBoardY/5;
 			if(!isServer){
-				top=GameContants.sizeOfBoardY;
-				bot=top-GameContants.sizeOfBoardY/5;
+				top=GameContants.getInstance().sizeOfBoardY;
+				bot=top-GameContants.getInstance().sizeOfBoardY/5;
 			}
 			for(int i=bot;i<top;i++){
-				for(int j=0;j<GameContants.sizeOfBoardX;j++){
+				for(int j=0;j<GameContants.getInstance().sizeOfBoardX;j++){
 					Point p;
 					p.x=j;
 					p.y=i;

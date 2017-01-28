@@ -25,15 +25,15 @@ public class PlayGroundScript : MonoBehaviour {
 		meshCollider.sharedMesh=mesh;
 	}
 	private void generateVertices(){
-		int xSize=GameContants.sizeOfBoardX,ySize=GameContants.sizeOfBoardY;
+		int xSize=GameContants.getInstance().sizeOfBoardX,ySize=GameContants.getInstance().sizeOfBoardY;
 		xSize+=1;
 		ySize+=1;
 		vertices = new Vector3[xSize*ySize];
-		planeOffset=new Vector3(-xSize/2*GameContants.boxSize,0.1f,-ySize/2*GameContants.boxSize);
+		planeOffset=new Vector3(-xSize/2*GameContants.getInstance().boxSize,0.1f,-ySize/2*GameContants.getInstance().boxSize);
 		
 		for (int i = 0, y = 0; y < ySize; y++) {
 			for (int x = 0; x < xSize; x++, i++) {
-				vertices[i] = new Vector3(x*GameContants.boxSize,0 ,y*GameContants.boxSize)+planeOffset;
+				vertices[i] = new Vector3(x*GameContants.getInstance().boxSize,0 ,y*GameContants.getInstance().boxSize)+planeOffset;
 			}
 		}
 		xSize--;ySize--;
@@ -62,7 +62,7 @@ public class PlayGroundScript : MonoBehaviour {
 		mesh.tangents = tangents;
 	}
 	private void generateTriangles(){
-		int xSize=GameContants.sizeOfBoardX,ySize=GameContants.sizeOfBoardY;
+		int xSize=GameContants.getInstance().sizeOfBoardX,ySize=GameContants.getInstance().sizeOfBoardY;
 		int[] triangles = new int[xSize*ySize * 6];
 		for (int ti = 0, vi = 0, y = 0; y < ySize; y++, vi++) {
 			//break;

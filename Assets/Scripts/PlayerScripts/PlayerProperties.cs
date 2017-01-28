@@ -45,8 +45,8 @@ public class PlayerProperties {
 			playerType=0;
 			addPowers(1,20,20);
 		}
-		loc.x=playerIndex%GameContants.sizeOfBoardX;
-		loc.y=playerIndex/GameContants.sizeOfBoardX;
+		loc.x=playerIndex%GameContants.getInstance().sizeOfBoardX;
+		loc.y=playerIndex/GameContants.getInstance().sizeOfBoardX;
 	}
 	private void Load() {
 		if(File.Exists(Application.persistentDataPath + fileName)) {
@@ -57,7 +57,7 @@ public class PlayerProperties {
 		}else{
 			powers=new List<PowerStruct>();
 		}
-		healthMetre= PlayerPrefs.GetInt(fileName+"Health",GameContants.DefaultHealth);
+		healthMetre= PlayerPrefs.GetInt(fileName+"Health",GameContants.getInstance().DefaultHealth);
 	}
 	public void addPowers(int id, int strength, int range){
 		PowerStruct power=new PowerStruct();

@@ -14,9 +14,9 @@ public class MyPlayerScript : NetworkBehaviour {
 	private TimeTracker timeTracker;
 	public Camera cam;
 	private GameMoveListener gameMoveListener;
-	private Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
+	private Vector3 offset=new Vector3(-GameContants.getInstance().sizeOfBoardX/2.0f+0.5f,0,-GameContants.getInstance().sizeOfBoardY/2.0f+0.5f);
 	private float playerHeight=0;
-	private Vector3 opponentPost=new Vector3(0,0,GameContants.sizeOfBoardY*GameContants.boxSize);
+	private Vector3 opponentPost=new Vector3(0,0,GameContants.getInstance().sizeOfBoardY*GameContants.getInstance().boxSize);
 	protected PlayerDetails[] players;
 	private GameObject[] playerObjects;
 	private PlayerControlScript[] playerControls;

@@ -12,7 +12,7 @@ public class CameraControl : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		transform.position=GameContants.boxSize*transform.position;
+		transform.position=GameContants.getInstance().boxSize*transform.position;
 		checkBoard= GameObject.Instantiate(checkBoardPrefab);
 		checkBoard.name="CheckBoard";
 		transform.LookAt (checkBoard.transform.position);

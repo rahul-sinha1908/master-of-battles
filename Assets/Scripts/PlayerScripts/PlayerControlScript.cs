@@ -10,7 +10,7 @@ public class PlayerControlScript : MonoBehaviour {
 	private ParticleSystem particles;
 	private bool isServer, isLocalPlayer;
 	private CharacterController controller;
-	private Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
+	private Vector3 offset=new Vector3(-GameContants.getInstance().sizeOfBoardX/2.0f+0.5f,0,-GameContants.getInstance().sizeOfBoardY/2.0f+0.5f);
 	private float playerHeight=0;
 	private float opponentPost;
 	private Camera cam;
@@ -56,7 +56,7 @@ public class PlayerControlScript : MonoBehaviour {
 		//DONE Put this segment while creating players
 		isServer=server;
 		isLocalPlayer=local;
-		opponentPost=GameContants.sizeOfBoardY*GameContants.boxSize;
+		opponentPost=GameContants.getInstance().sizeOfBoardY*GameContants.getInstance().boxSize;
 		if((isServer && !isLocalPlayer) || (!isServer && isLocalPlayer))
 			opponentPost=opponentPost*-1;
 		me=player;
@@ -95,9 +95,9 @@ public class PlayerControlScript : MonoBehaviour {
 			rangeAttack(x1,y1,x2,y2,p);
 		}else if(p.id==3){
 			raySpreader(x1,y1,x2,y2,p);
-		}else if(p.id==2){
+		}else if(p.id==4){
 			bombAttack(x1,y1,x2,y2,p);
-		}else if(p.id==2){
+		}else if(p.id==5){
 			trippleShot(x1,y1,x2,y2,p);
 		}
 	}
@@ -160,7 +160,7 @@ public class PlayerControlScript : MonoBehaviour {
 		var shape=particles.shape;
 		var emission=particles.emission;
 		main.loop=false;
-		main.startSpeed=10*GameContants.boxSize;
+		main.startSpeed=10*GameContants.getInstance().boxSize;
 		main.startLifetime=dist/main.startSpeed.constant;
 		shape.enabled=false;
 		emission.enabled=true;

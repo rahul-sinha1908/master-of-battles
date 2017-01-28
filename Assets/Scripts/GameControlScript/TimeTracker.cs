@@ -55,7 +55,7 @@ public class TimeTracker : NetworkBehaviour {
 				timeleft=-1;
 			}else if(!playerCountDownClient && playerCountDownServer){
 				if(timeleft==-1){
-					timeleft=GameContants.timeConstant;
+					timeleft=GameContants.getInstance().timeConstant;
 					localTimeLeft=timeleft;
 				}else{
 					localTimeLeft-=Time.deltaTime;
@@ -63,7 +63,7 @@ public class TimeTracker : NetworkBehaviour {
 				}
 			}else if(playerCountDownClient && !playerCountDownServer){
 				if(timeleft==-1){
-					timeleft=GameContants.timeConstant;
+					timeleft=GameContants.getInstance().timeConstant;
 					localTimeLeft=timeleft;
 				}else{
 					localTimeLeft-=Time.deltaTime;

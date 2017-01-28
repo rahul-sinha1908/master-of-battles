@@ -11,8 +11,8 @@ namespace MasterOfBattles{
 		}
 		public static Point getHitBox(Vector3 v){
 			Point p;
-			p.x=(int)Mathf.Floor(v.x/GameContants.boxSize)+GameContants.sizeOfBoardX/2;
-			p.y=(int)Mathf.Floor(v.z/GameContants.boxSize)+GameContants.sizeOfBoardY/2;
+			p.x=(int)Mathf.Floor(v.x/GameContants.getInstance().boxSize)+GameContants.getInstance().sizeOfBoardX/2;
+			p.y=(int)Mathf.Floor(v.z/GameContants.getInstance().boxSize)+GameContants.getInstance().sizeOfBoardY/2;
 			return p;
 		}
 
@@ -27,7 +27,7 @@ namespace MasterOfBattles{
 			return false;
 		}
 		public static bool validatePoint(Point p){
-			if(p.x>=0 && p.x<GameContants.sizeOfBoardX && p.y>=0 && p.y<GameContants.sizeOfBoardY)
+			if(p.x>=0 && p.x<GameContants.getInstance().sizeOfBoardX && p.y>=0 && p.y<GameContants.getInstance().sizeOfBoardY)
 				return true;
 			return false;
 		}
@@ -53,11 +53,11 @@ namespace MasterOfBattles{
 			return null;
 		}
 
-		private static Vector3 offset=new Vector3(-GameContants.sizeOfBoardX/2.0f+0.5f,0,-GameContants.sizeOfBoardY/2.0f+0.5f);
+		private static Vector3 offset=new Vector3(-GameContants.getInstance().sizeOfBoardX/2.0f+0.5f,0,-GameContants.getInstance().sizeOfBoardY/2.0f+0.5f);
 		public static Vector3 getHitVector(Point p, float height=0){
 			Vector3 pos=new Vector3(p.x,height, p.y)+offset;
-			pos.x*=GameContants.boxSize;
-			pos.z*=GameContants.boxSize;
+			pos.x*=GameContants.getInstance().boxSize;
+			pos.z*=GameContants.getInstance().boxSize;
 			return pos;
 		}
 		public static Vector3 getHitVector(int x, int y, float height=0){

@@ -164,7 +164,7 @@ public class WeaponAssignmentScript : MonoBehaviour {
 
 	private void initiatePanel(){
 		PowersContants pC=PowersContants.getInstance();
-		int totPlayers=GameContants.NumberOfPlayer;
+		int totPlayers=GameContants.getInstance().NumberOfPlayer;
 
 		for(int i=0;i<=pC.total;i++){
 			addWeapons(pC.powers[i]);
@@ -228,7 +228,7 @@ public class WeaponAssignmentScript : MonoBehaviour {
 			strength.maxValue=100;
 			strength.minValue=0;
 			range.minValue=0;
-			range.maxValue=(GameContants.sizeOfBoardX+GameContants.sizeOfBoardY)/2;
+			range.maxValue=(GameContants.getInstance().sizeOfBoardX+GameContants.getInstance().sizeOfBoardY)/2;
 
 			int i;
 			for(i=0;i<pP.powers.Count;i++){

@@ -34,14 +34,14 @@ public class CheckSelectScript : MonoBehaviour {
 		GameRunningConstants.getInstance().checkSelectScript=this;
 	}
 	private void generateVerticesAndTriangle(int x, int y, int colorInd){
-		x=x-GameContants.sizeOfBoardX/2;
-		y=y-GameContants.sizeOfBoardY/2;
-		x*=GameContants.boxSize;
-		y*=GameContants.boxSize;
+		x=x-GameContants.getInstance().sizeOfBoardX/2;
+		y=y-GameContants.getInstance().sizeOfBoardY/2;
+		x*=GameContants.getInstance().boxSize;
+		y*=GameContants.getInstance().boxSize;
 		vertices.Add(new Vector3(x,0,y)+heightOffset);
-		vertices.Add(new Vector3(x+GameContants.boxSize,0,y)+heightOffset);
-		vertices.Add(new Vector3(x,0,y+GameContants.boxSize)+heightOffset);
-		vertices.Add(new Vector3(x+GameContants.boxSize,0,y+GameContants.boxSize)+heightOffset);
+		vertices.Add(new Vector3(x+GameContants.getInstance().boxSize,0,y)+heightOffset);
+		vertices.Add(new Vector3(x,0,y+GameContants.getInstance().boxSize)+heightOffset);
+		vertices.Add(new Vector3(x+GameContants.getInstance().boxSize,0,y+GameContants.getInstance().boxSize)+heightOffset);
 		
 		if(colorInd==BoardConstants.Select){
 			uv.Add(new Vector2(0,0.5f));

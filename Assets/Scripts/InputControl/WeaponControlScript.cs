@@ -76,7 +76,7 @@ public class WeaponControlScript : MonoBehaviour {
 	}
 	private List<Point> getPowerPlaces(int id, int range, int strength, int x, int y, Moves m){
 		List<Point> list = new List<Point>();
-		int dr=Mathf.RoundToInt(range/GameContants.sqrt2);
+		int dr=Mathf.RoundToInt(range/GameContants.getInstance().sqrt2);
 		Dev.log(Tag.WeaponControlScript, "Attack Id = "+id);
 		if(id==1){
 			for(int i=0;i<range;i++){
