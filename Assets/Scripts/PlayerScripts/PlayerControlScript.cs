@@ -91,6 +91,14 @@ public class PlayerControlScript : MonoBehaviour {
 		disableAllProps();
 		if(p.id==1){
 			straightAttack(x1,y1,x2,y2,p);
+		}else if(p.id==2){
+			rangeAttack(x1,y1,x2,y2,p);
+		}else if(p.id==3){
+			raySpreader(x1,y1,x2,y2,p);
+		}else if(p.id==2){
+			bombAttack(x1,y1,x2,y2,p);
+		}else if(p.id==2){
+			trippleShot(x1,y1,x2,y2,p);
 		}
 	}
 	private void disableAllProps(){
@@ -99,32 +107,58 @@ public class PlayerControlScript : MonoBehaviour {
 	private void straightAttack(int x1, int y1, int x2, int y2, PowerStruct p){
 		//TODO Attack Straight Attacks
 
-		Vector3 pos=GameMethods.getHitVector(x1,y1,1);
-		Vector3 pos1=GameMethods.getHitVector(x2,y2,1);
-		Vector3 finalPos=pos1;
-		Dev.log(Tag.PlayerAttack,"Shooting from "+pos+" to "+pos1);
+		Point posP=new Point();
+		posP.x=x1;posP.y=y1;
+		Point posP1=new Point();
+		posP1.x=x2;posP1.y=y2;
+		Vector3 pos=GameMethods.getHitVector(posP,1);
+		PlayerControlScript pl=null;
+		do{
+			if(posP.x<posP1.x)
+				posP.x++;
+			else if(posP.x>posP1.x)
+				posP.x--;
+			if(posP.y<posP1.y)
+				posP.y++;
+			else if(posP.y>posP1.y)
+				posP.y--;
+			Dev.log(Tag.PlayerAttack,"Check at  : "+posP.x + " : " + posP.y);				
+			if(ChessBoardFormation.getInstance().myBoard[posP.x, posP.y]!= TypeO.None){
+				Dev.log(Tag.PlayerAttack,"Found at  : "+posP.x + " : " + posP.y);
+				pl=GameMethods.getPlayerCSAt(posP);
+				if(pl!=null)
+					pl.reduceHealth(p.strength);
+				break;
+			}
+		}while(!GameMethods.comparePoints(posP,posP1));
 
-		Vector3 dir=pos1-pos;
-		RaycastHit hit;
-		if(Physics.Raycast(pos, dir, out hit , GameContants.boxSize*(GameContants.sizeOfBoardX+GameContants.sizeOfBoardY),attackMask)){
-			GameObject g=hit.collider.gameObject;
-			if(GameMethods.sqrDist(pos,pos1)+GameContants.boxSize/2.0f>GameMethods.sqrDist(pos,hit.point)){
-				finalPos=hit.point;
-				Dev.log(Tag.PlayerAttack,"Hit the target : "+g.name);
-				if(g!=null){
-					PlayerControlScript pl=g.GetComponent<PlayerControlScript>();
-					if(pl!=null)
-						pl.reduceHealth(p.strength);
+		Vector3 finalPos=GameMethods.getHitVector(posP,1);
+		if(!GameMethods.comparePoints(posP,posP1)){
+			//TODO Problem in detecting the player in the player backup Moves
+			Dev.log(Tag.PlayerAttack, "Got into the checking system : " +ChessBoardFormation.getInstance().myBoard[posP.x, posP.y]);
+			GameRunningConstants grc=GameRunningConstants.getInstance();
+			List<Moves> m = grc.backUpMyMoves;
+			if(!isLocalPlayer)
+				m = grc.backUpOppAttackMoves;
+			for(int i=0;i<m.Count;i++){
+				if(grc.localPlayerScript.getPlayerControlScript(m[i].ind) == pl || grc.networkPlayerScript.getPlayerControlScript(m[i].ind) == pl){
+					Dev.log(Tag.PlayerAttack, "Got the local player or Network Player");
+					Moves mo = m[i];
+					mo.x=(short)posP.x;
+					mo.y=(short)posP.y;
+					m[i]=mo;
+					break;
 				}
 			}
 		}
+		Dev.log(Tag.PlayerAttack,"Shooting from "+pos+" to "+finalPos);		
 
+		//TODo Problem The attack fire is not stopping at the correct position
 		transform.LookAt(finalPos);
 		float dist=Vector3.Distance(pos,finalPos);
 		var main=particles.main;
 		var shape=particles.shape;
 		var emission=particles.emission;
-		main.startSpeed=5;
 		main.loop=false;
 		main.startSpeed=10*GameContants.boxSize;
 		main.startLifetime=dist/main.startSpeed.constant;
@@ -137,7 +171,35 @@ public class PlayerControlScript : MonoBehaviour {
 		emission.SetBursts(b);
 		emission.rateOverTime=30;
 		Dev.log(Tag.PlayerControlScript,"Its Just Before Play");
-		particles.Play();
+		// particles.Play();
+
+	}
+	private void rangeAttack(int x1, int y1, int x2, int y2, PowerStruct p){
+		PlayerControlScript pl =GameMethods.getPlayerCSAt(x2, y2);
+		if(pl !=null){
+			pl.reduceHealth(p.strength);
+		}
+	}
+	private void raySpreader(int x1, int y1, int x2, int y2, PowerStruct p){
+
+	}
+	private void bombAttack(int x1, int y1, int x2, int y2, PowerStruct p){
+		int bombRange;
+		if(p.otherDef=="")
+			bombRange=0;
+		else
+			bombRange=int.Parse(p.otherDef);
+		
+		for(int i=0; i<=bombRange; i++){
+			if(i==0){
+
+			}else{
+
+			}
+		}
+		
+	}
+	private void trippleShot(int x1, int y1, int x2, int y2, PowerStruct p){
 
 	}
 	public void reduceHealth(int val){

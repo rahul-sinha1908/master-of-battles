@@ -27,9 +27,9 @@ namespace MasterOfBattles{
 			list[(int)Tag.GameMoveListener]=false;
 			list[(int)Tag.UnOrdered]=false;
 			list[(int)Tag.WeaponControlScript]=false;
-			list[(int)Tag.DisplayInformation]=true;
+			list[(int)Tag.DisplayInformation]=false;
 			list[(int)Tag.WeaponAssignmentScript]=false;
-			list[(int)Tag.InputManager]=true;
+			list[(int)Tag.InputManager]=false;
 			//list[(int)Tag.]=true;
 		}
 		public bool isAllowed(Tag tag){

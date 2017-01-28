@@ -134,6 +134,9 @@ public class MyPlayerScript : NetworkBehaviour {
 	public PlayerDetails[] getPlayerDetails(){
 		return players;
 	}
+	public PlayerControlScript getPlayerControlScript(int ind){
+		return playerControls[ind];
+	}
 
 	public void sendMoves(){
 		if(!isLocalPlayer)
@@ -243,8 +246,18 @@ public class MyPlayerScript : NetworkBehaviour {
 			if(moves[i].attackDef==""){
 				Dev.log(Tag.PlayerMove,"Entered Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 				grc.addOpponentPlaceMoves(players[moves[i].ind]);
+
+				TypeO meP;
+				if(isLocalPlayer)
+					meP=TypeO.MyPlayer;
+				else
+					meP=TypeO.OpponentPlayer;
+				
+				myBoard[players[moves[i].ind].x,players[moves[i].ind].y]=TypeO.None;
 				players[moves[i].ind].x=moves[i].x;
 				players[moves[i].ind].y=moves[i].y;
+				myBoard[players[moves[i].ind].x,players[moves[i].ind].y]=meP;
+
 				Dev.log(Tag.PlayerMove,"Exit Here "+players[moves[i].ind].x+" : "+players[moves[i].ind].y);
 			}else{
 				grc.addOpponentAttackMoves(moves[i]);
