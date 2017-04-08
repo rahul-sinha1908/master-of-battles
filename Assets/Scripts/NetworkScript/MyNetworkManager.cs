@@ -10,7 +10,7 @@ public class MyNetworkManager : NetworkManager {
 	//TODO Restrict Adding more than one Client
 	[SerializeField]
 	private NetworkDisc networkDisc;
-	public GameObject mainMenu, searchHosts;
+	public GameObject mainMenu, searchHosts, productStore;
 	public GameObject  buttonPrefab;
 	public RectTransform panelToAdd;
 
@@ -50,14 +50,15 @@ public class MyNetworkManager : NetworkManager {
 	public void SearchForHosts(){
 		networkDisc.Initialize();
 		networkDisc.StartAsClient();
-		mainMenu.SetActive(false);
-		searchHosts.SetActive(true);
+		//mainMenu.SetActive(false);
+		Camera.main.transform.LookAt(mainMenu.transform);
+		//searchHosts.SetActive(true);
 	}
 	public void AddButtons(IPS x){
 		GameObject goButton = (GameObject)Instantiate(buttonPrefab);
 		goButton.transform.SetParent(panelToAdd, false);
 		goButton.transform.localScale = new Vector3(1, 1, 1);
-		Text t= goButton.GetComponentInChildren<Text>();
+		Text t= goButton.transform.FindChild("Text").GetComponent<Text>();
 		t.text=x.name+" ("+x.ip+")";
 
 		Button tempButton = goButton.GetComponent<Button>();

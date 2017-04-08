@@ -153,7 +153,7 @@ public class PlayerControlScript : MonoBehaviour {
 		}
 		Dev.log(Tag.PlayerAttack,"Shooting from "+pos+" to "+finalPos);		
 
-		//TODo Problem The attack fire is not stopping at the correct position
+		//TODO Problem The attack fire is not stopping at the correct position
 		transform.LookAt(finalPos);
 		float dist=Vector3.Distance(pos,finalPos);
 		var main=particles.main;
@@ -177,7 +177,7 @@ public class PlayerControlScript : MonoBehaviour {
 	private void rangeAttack(int x1, int y1, int x2, int y2, PowerStruct p){
 		PlayerControlScript pl =GameMethods.getPlayerCSAt(x2, y2);
 		if(pl !=null){
-			pl.reduceHealth(p.strength);
+			pl.reduceHealth(p.strength); 
 		}
 	}
 	private void raySpreader(int x1, int y1, int x2, int y2, PowerStruct p){
@@ -200,7 +200,9 @@ public class PlayerControlScript : MonoBehaviour {
 		
 	}
 	private void trippleShot(int x1, int y1, int x2, int y2, PowerStruct p){
-
+		for(int i=0;i<p.range;i++){
+			
+		}
 	}
 	public void reduceHealth(int val){
 		Dev.log(Tag.PlayerControlScript,"Hit the player : "+transform.name);

@@ -10,7 +10,7 @@ namespace MasterOfBattles{
 	}
 
 	public enum Tag{
-		UnOrdered, CheckBoard, MyPlayerScript, PlayerControlScript, PlayerMove, PlayerAttack, PlayerSelect, GameMoveListener, WeaponControlScript, DisplayInformation, WeaponAssignmentScript, InputManager
+		UnOrdered, CheckBoard, MyPlayerScript, PlayerControlScript, PlayerMove, PlayerAttack, PlayerSelect, GameMoveListener, WeaponControlScript, DisplayInformation, WeaponAssignmentScript, InputManager, MenuControl
 	}
 	public class DevTag{
 		public const int MAX=100;
@@ -30,6 +30,7 @@ namespace MasterOfBattles{
 			list[(int)Tag.DisplayInformation]=false;
 			list[(int)Tag.WeaponAssignmentScript]=false;
 			list[(int)Tag.InputManager]=false;
+			list[(int)Tag.MenuControl]=true;
 			//list[(int)Tag.]=true;
 		}
 		public bool isAllowed(Tag tag){
