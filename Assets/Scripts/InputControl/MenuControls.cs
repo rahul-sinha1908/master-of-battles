@@ -263,6 +263,35 @@ public class MenuControls : MonoBehaviour {
 		rayCaster.enabled=true;
     }
 
+	IEnumerator getBalanceEnum() {
+		/*
+		curl -X POST\
+-H 'Content-Type:application/json'\
+-H 'Authorization: Bearer ACCESS_TOKEN'\
+    https://sandbox.unocoin.co/api/v1/wallet/bitcoinaddress
+		*/
+
+        WWWForm form = new WWWForm();
+
+        form.headers.Add("Content-Type", "application/json" );
+		form.headers.Add("Authorization","Bearer "+ACCESS_TOKEN);
+ 
+        UnityWebRequest www = UnityWebRequest.Post("https://sandbox.unocoin.co/api/v1/wallet/bitcoinaddress", form);
+		rayCaster.enabled=false;
+		waitScreen.SetActive(true);
+        yield return www.Send();
+ 
+        if(www.isError) {
+            Debug.Log(www.error);
+        }
+        else {
+            Dev.log(Tag.Network, "Form upload complete! "+www.downloadHandler.text);
+			MessageInfo info = MessageInfo.CreateFromJSON(www.downloadHandler.text);
+        }
+		waitScreen.SetActive(false);
+		rayCaster.enabled=true;
+    }
+
 	public class MessageInfo
 	{
 		/*
@@ -270,6 +299,7 @@ public class MenuControls : MonoBehaviour {
 		*/
 		public string result;
 		public string message;
+		public string btc_balance, inr_balance;
 		public int status_code;
 
 		public static MessageInfo CreateFromJSON(string jsonString)
