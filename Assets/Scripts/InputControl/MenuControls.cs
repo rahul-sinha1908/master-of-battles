@@ -22,7 +22,7 @@ public class MenuControls : MonoBehaviour {
 	private float bitCoinsLeft;
 	private string serverAccessToken="";
 	private string serverAddress="";
-	private int rate=41310;
+	private float rate=41310;
 	
 	// Use this for initialization
 	void Start () {
@@ -263,6 +263,7 @@ public class MenuControls : MonoBehaviour {
     }'
     https://sandbox.unocoin.co/api/v1/trading/buyingbtc
 		*/
+		ACCESS_TOKEN="c6ce54622ea8b8ea9a024deb44d1fbdcb00bea29";
 		if(ACCESS_TOKEN==""){
 			displayMessage("First Log in");
 			yield break;
@@ -281,22 +282,52 @@ public class MenuControls : MonoBehaviour {
 			yield break;
 		}
 
+		Dictionary<string, string> head1=new Dictionary<string, string>();
+		head1.Add("Content-Type", "application/json" );
+		head1.Add("Authorization","Bearer "+ACCESS_TOKEN);
+
+        //UnityWebRequest www = UnityWebRequest.Post("https://sandbox.unocoin.co/api/v1/trading/buyingbtc", form);
+		WWW www1 = new WWW("https://sandbox.unocoin.co/api/v1/general/prices", null , head1);
+        //yield return www.Send();
+		rayCaster.enabled=false;
+		waitScreen.SetActive(true);
+		yield return www1;
+ 
+        if(www1.error!=null) {
+            Dev.log(Tag.Network,www1.error);
+			displayMessage("Error in fetching data");
+			waitScreen.SetActive(false);
+			rayCaster.enabled=true;
+			yield break;
+        }
+        else {
+            Dev.log(Tag.Network, "Fetching Rate complete! "+www1.text);
+			MessageInfo info = MessageInfo.CreateFromJSON(www1.text);
+			if(info.result!="error"){
+				rate=float.Parse(info.buybtc);
+			}else{
+				displayMessage("Error in fetching data");
+				waitScreen.SetActive(false);
+				rayCaster.enabled=true;
+				yield break;
+			}
+        }
 		Dictionary<string, string> head=new Dictionary<string, string>();
-		head.Add("Content-Type", "application/json" );
+		//head.Add("Content-Type", "application/json" );
+		head.Add("Content-Type", "application/x-www-form-urlencoded" );
 		head.Add("Authorization","Bearer "+ACCESS_TOKEN);
 
 		form.AddField("destination", "My wallet");
 		form.AddField("inr", ""+inrVal);
-		form.AddField("fee",""+(0.01*inrVal));
-		form.AddField("tax",""+(0.15*0.01*inrVal));
-		form.AddField("total",""+(inrVal+0.01*inrVal+0.15*0.01*inrVal));
+		form.AddField("total",""+Math.Round(inrVal+Math.Round(0.01*inrVal)+Math.Round(0.15*Math.Round(0.01*inrVal))));
+		form.AddField("btc", ""+(inrVal*1.0/rate).ToString("0.00000000"));
+		form.AddField("fee",""+Math.Round(0.01*inrVal));
+		form.AddField("tax",""+Math.Round(0.15*Math.Round(0.01*inrVal)));
 		form.AddField("rate", ""+rate);
-		form.AddField("btc", ""+(inrVal*1.0/rate));
+		Dev.log(Tag.Network, (inrVal*1.0/rate).ToString("0.00000000"));
  
         //UnityWebRequest www = UnityWebRequest.Post("https://sandbox.unocoin.co/api/v1/trading/buyingbtc", form);
 		WWW www = new WWW("https://sandbox.unocoin.co/api/v1/trading/buyingbtc", form.data, head);
-		rayCaster.enabled=false;
-		waitScreen.SetActive(true);
         //yield return www.Send();
 		yield return www;
  
@@ -317,7 +348,6 @@ public class MenuControls : MonoBehaviour {
 		waitScreen.SetActive(false);
 		rayCaster.enabled=true;
     }
-
 	IEnumerator loginIEnum() {
         WWWForm form = new WWWForm();
 
@@ -327,7 +357,8 @@ public class MenuControls : MonoBehaviour {
 		form.AddField("password", txt_password.text);
  
         //UnityWebRequest www = UnityWebRequest.Post("https://cryptothon-razor08.c9users.io/login", form);
-		WWW www=new WWW("https://35.160.197.192:3000/login", form.data, new Dictionary<string, string>());
+		//WWW www=new WWW("https://35.160.197.192:3000/login", form.data, new Dictionary<string, string>());
+		WWW www=new WWW("https://cryptothon-razor08.c9users.io/loginexec", form.data, new Dictionary<string, string>());
 		rayCaster.enabled=false;
 		waitScreen.SetActive(true);
         //yield return www.Send();
@@ -343,6 +374,40 @@ public class MenuControls : MonoBehaviour {
 			}else{
 				displayMessage("Error in fetching Datas");
 			}
+		}else{
+			Dev.log(Tag.Network,www.error);
+			displayMessage(www.error);
+		}
+        // if(www.isError) {
+        //     Dev.log(Tag.Network,www.error);
+        // }
+        // else {
+        //     Dev.log(Tag.Network, "Form upload complete! "+www.downloadHandler.text);
+		// 	MessageInfo info = MessageInfo.CreateFromJSON(www.downloadHandler.text);
+        // }
+		waitScreen.SetActive(false);
+		rayCaster.enabled=true;
+    }
+	
+	IEnumerator sendUpdateIEnum(string btc_bal, string inr_bal) {
+        WWWForm form = new WWWForm();
+
+		Email_ID = txt_username.text;
+		
+        form.AddField("email", Email_ID);
+		form.AddField("BTCBal", btc_bal);
+		form.AddField("INRBal", inr_bal);
+ 
+        //UnityWebRequest www = UnityWebRequest.Post("https://cryptothon-razor08.c9users.io/login", form);
+		//WWW www=new WWW("https://35.160.197.192:3000/updater", form.data, new Dictionary<string, string>());
+		WWW www=new WWW("https://cryptothon-razor08.c9users.io/updater", form.data, new Dictionary<string, string>());
+		// rayCaster.enabled=false;
+		// waitScreen.SetActive(true);
+        //yield return www.Send();
+		yield return www;
+		
+		if(www.error==null){
+			Dev.log(Tag.Network, "Server update complete! "+www.text);
 		}else{
 			Dev.log(Tag.Network,www.error);
 			displayMessage(www.error);
@@ -412,6 +477,7 @@ public class MenuControls : MonoBehaviour {
 			Dev.log(Tag.Network, ""+info.btc_balance);
 			if(info.result!="error"){
 				bitCoinsLeft=float.Parse(info.btc_balance);
+				StartCoroutine(sendUpdateIEnum(info.btc_balance, info.inr_balance));
 			}else{
 				displayMessage("Error in Fetching datas");
 			}
@@ -427,7 +493,7 @@ public class MenuControls : MonoBehaviour {
 		*/
 		public string result;
 		public string message;
-		public string btc_balance, inr_balance;
+		public string btc_balance, inr_balance, buybtc;
 		public int status_code;
 
 		public static MessageInfo CreateFromJSON(string jsonString)
